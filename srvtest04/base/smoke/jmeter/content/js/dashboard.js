@@ -187,7 +187,7 @@ $(document).ready(function() {
     }, [[0, 0]], 3);
 
     // Create statistics table
-    createTable($("#statisticsTable"), {"supportsControllersDiscrimination": true, "overall": {"data": ["Total", 11, 0, 0.0, 375.27272727272725, 261, 884, 323.0, 793.8000000000003, 884.0, 884.0, 1.0374422333301896, 7.341948475667264, 0.1286671519852872], "isController": false}, "titles": ["Label", "#Samples", "FAIL", "Error %", "Average", "Min", "Max", "Median", "90th pct", "95th pct", "99th pct", "Transactions/s", "Received", "Sent"], "items": [{"data": ["GET /reserve.php", 11, 0, 0.0, 375.27272727272725, 261, 884, 323.0, 793.8000000000003, 884.0, 884.0, 1.0374422333301896, 7.341948475667264, 0.1286671519852872], "isController": false}]}, function(index, item){
+    createTable($("#statisticsTable"), {"supportsControllersDiscrimination": true, "overall": {"data": ["Total", 11, 0, 0.0, 337.81818181818176, 251, 824, 273.0, 746.6000000000003, 824.0, 824.0, 1.0554596046824025, 7.468707271876799, 0.13090172831510266], "isController": false}, "titles": ["Label", "#Samples", "FAIL", "Error %", "Average", "Min", "Max", "Median", "90th pct", "95th pct", "99th pct", "Transactions/s", "Received", "Sent"], "items": [{"data": ["GET /reserve.php", 11, 0, 0.0, 337.81818181818176, 251, 824, 273.0, 746.6000000000003, 824.0, 824.0, 1.0554596046824025, 7.468707271876799, 0.13090172831510266], "isController": false}]}, function(index, item){
         switch(index){
             // Errors pct
             case 3:
