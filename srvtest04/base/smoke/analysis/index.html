@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unitrade Perf — base / smoke / 20260515_1924</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    body { background:#f4f6f9; font-family:'Segoe UI',system-ui,sans-serif; }
+    .kpi-card  { border-left:4px solid var(--bs-primary); }
+    .bc-banner { border-left:6px solid #ffc107; background:#ffc10718; padding:1rem 1.5rem; border-radius:.5rem; }
+    .section-title { border-bottom:2px solid #dee2e6; padding-bottom:.3rem; margin-bottom:1rem; font-weight:600; }
+    .chart-wrap { position:relative; height:280px; }
+    code { background:#e9ecef; padding:2px 6px; border-radius:4px; font-size:.82em; }
+    .table td, .table th { vertical-align:middle; }
+  </style>
+</head>
+<body>
+<div class="container-fluid py-4 px-4">
+
+  <!-- Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+      <h4 class="mb-0 fw-bold">Unitrade Performance Report</h4>
+      <small class="text-muted">
+        Cliente: <strong>base</strong> &nbsp;·&nbsp;
+        Tipo: <strong>smoke</strong> &nbsp;·&nbsp;
+        Run: <strong>20260515_1924</strong>
+      </small>
+    </div>
+    <span class="badge px-4 py-2 fs-6" style="background:#ffc107">WARN</span>
+  </div>
+
+  <!-- KPIs -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card kpi-card h-100" style="border-color:#0d6efd">
+        <div class="card-body">
+          <div class="text-muted small mb-1">Avg p95</div>
+          <div class="fs-2 fw-bold">930 <small class="fs-6 text-muted">ms</small></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card kpi-card h-100" style="border-color:#6f42c1">
+        <div class="card-body">
+          <div class="text-muted small mb-1">Total Samples</div>
+          <div class="fs-2 fw-bold">10</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card kpi-card h-100" style="border-color:#28a745">
+        <div class="card-body">
+          <div class="text-muted small mb-1">Error Rate</div>
+          <div class="fs-2 fw-bold text-success">0.0%</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card kpi-card h-100" style="border-color:#fd7e14">
+        <div class="card-body">
+          <div class="text-muted small mb-1">Throughput</div>
+          <div class="fs-2 fw-bold">0.892 <small class="fs-6 text-muted">req/s</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottleneck -->
+  <div class="bc-banner mb-4 d-flex align-items-center gap-3 flex-wrap">
+    <span class="badge px-3 py-2 fs-6 fw-semibold" style="background:#ffc107">REGRESSION-SPIKE</span>
+    <span>Regresión detectada en: GET /reserve.php. Solo en el run actual — el run anterior era normal. Repetir el run para confirmar o descartar.</span>
+  </div>
+
+  <!-- Endpoints table -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="section-title">Métricas por Endpoint</h5>
+      <div class="table-responsive">
+        <table class="table table-sm table-hover table-bordered align-middle mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>Endpoint</th><th class="text-center">Estado</th>
+              <th class="text-end">p50</th><th class="text-end">p90</th>
+              <th class="text-end">p95</th><th class="text-end">p99</th>
+              <th class="text-end">Avg</th><th class="text-end">Error%</th>
+              <th class="text-end">TPS</th><th class="text-end">Δ baseline</th>
+              <th>Motivo alerta</th>
+            </tr>
+          </thead>
+          <tbody>
+        <tr class="table-warning">
+          <td class="fw-semibold"><code>GET /reserve.php</code></td>
+          <td class="text-center"><span class="badge bg-warning text-dark" style="font-size:.75rem">WARN</span></td>
+          <td class="text-end">320</td>
+          <td class="text-end">847</td>
+          <td class="text-end fw-bold">930</td>
+          <td class="text-end">997</td>
+          <td class="text-end">434.5</td>
+          <td class="text-end ">0.0%</td>
+          <td class="text-end">0.892/s</td>
+          <td class="text-end"><span class="text-danger fw-bold">+60%</span></td>
+          <td><small class="text-muted">p95 +60% sobre baseline</small></td>
+        </tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="section-title">Tendencia p95 (ms)</h5>
+          <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="section-title">Tendencia Error Rate (%)</h5>
+          <div class="chart-wrap"><canvas id="errChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recommendations -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="section-title">Recomendaciones</h5>
+      <table class="table table-sm table-bordered mb-0">
+        <thead class="table-dark">
+          <tr><th style="width:80px" class="text-center">Prioridad</th><th>Acción y detalle</th></tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td class="text-center"><span class="badge bg-warning">P2</span></td>
+          <td>
+            <div class="fw-semibold">Monitorear GET /reserve.php en próximos runs</div>
+            <div class="text-muted small mt-1">Advertencia: p95 +60.0% sobre baseline. No es crítico aún. Si persiste 2 runs más, escalar a P1.</div>
+          </td>
+        </tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer class="text-muted small text-end mt-2">
+    Generado: 2026-05-15 19:25:04 &nbsp;·&nbsp; performance-ut analyze.py
+  </footer>
+</div>
+
+<script>
+const CHART_OPTS = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { position: 'top' }, tooltip: { mode: 'index', intersect: false } },
+  scales: { y: { beginAtZero: false }, x: {} }
+};
+new Chart('trendChart', {
+  type: 'line',
+  data: {"labels": ["20260510_0900", "20260510_1400", "20260511_0900", "20260511_1100", "20260515_1912", "20260515_1914", "20260515_1916", "20260515_1918", "20260515_1920", "20260515_1923", "20260515_1924"], "datasets": [{"label": "GET /reserve.php", "data": [508, 599, 318, 461, 624, 728, 663, 658, 630, 622, 930], "borderColor": "#0d6efd", "backgroundColor": "#0d6efd22", "tension": 0.3, "fill": false, "pointRadius": 5, "pointHoverRadius": 7}]},
+  options: { ...CHART_OPTS, scales: { y: { title: { display:true, text:'p95 (ms)' }, beginAtZero:false }, x:{} } }
+});
+new Chart('errChart', {
+  type: 'line',
+  data: {"labels": ["20260510_0900", "20260510_1400", "20260511_0900", "20260511_1100", "20260515_1912", "20260515_1914", "20260515_1916", "20260515_1918", "20260515_1920", "20260515_1923", "20260515_1924"], "datasets": [{"label": "GET /reserve.php", "data": [0.0, 0.0, 0.0, 9.09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "borderColor": "#0d6efd", "backgroundColor": "#0d6efd22", "tension": 0.3, "fill": false, "pointRadius": 5}]},
+  options: { ...CHART_OPTS, scales: { y: { title: { display:true, text:'Error Rate (%)' }, beginAtZero:true, min:0 }, x:{} } }
+});
+</script>
+</body>
+</html>
