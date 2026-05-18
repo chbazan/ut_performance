@@ -95,9 +95,9 @@ tr:hover td { background: #f7fafc; }
   <h1>Unitrade Performance — CONCEPT / srvtest04 / smoke</h1>
   <div class="meta">
     <span>Test: Smoke (~5 min) — Validación post-deploy</span>
-    <span>Run: 202605181947</span>
-    <span>Versión: build-35</span>
-    <span>2026-05-18 19:47 UTC</span>
+    <span>Run: 202605181950</span>
+    <span>Versión: build-36</span>
+    <span>2026-05-18 19:50 UTC</span>
     
   </div>
 </div>
@@ -109,12 +109,12 @@ tr:hover td { background: #f7fafc; }
     <h2>Estado de la corrida</h2>
     <div class="kpi-grid">
       <div class="kpi-card">
-        <div class="value" style="color:#4299e1;">1066</div>
+        <div class="value" style="color:#4299e1;">952</div>
         <div class="label">avg P95 (ms)</div>
-        <div class="sub">Baseline: 1066 ms</div>
+        <div class="sub">Baseline: 952 ms</div>
       </div>
       <div class="kpi-card">
-        <div class="value" style="color:#d69e2e;">+0.0%</div>
+        <div class="value" style="color:#38a169;">-0.0%</div>
         <div class="label">Δ vs baseline global</div>
         <div class="sub">Últimas 50 corridas</div>
       </div>
@@ -154,29 +154,29 @@ tr:hover td { background: #f7fafc; }
       <div class="bc-reasoning">Sin alertas ni outliers en esta corrida.</div>
     </div>
 
-    <div class="narrative" style="margin-bottom:20px;">La plataforma Unitrade se encuentra en un estado saludable, con un P95 promedio de 1066.25 ms, muy cercano al baseline de 1066 ms. No se detectaron alertas de semáforo ni samplers con comportamiento anómalo en esta corrida.</div>
+    <div class="narrative" style="margin-bottom:20px;">El sistema se encuentra en un estado HEALTHY, operando con estabilidad. El P95 promedio de esta corrida es de 951.55 ms, muy cercano al baseline de 952 ms.</div>
 
     <div class="conc-grid">
       
 <div class="conc-card" style="background:#fff5f5;">
   <div class="icon">🚨</div>
   <div class="type">Escalar prioritario</div>
-  <h3>Sin alertas críticas — avg P95: 1066.25 ms</h3>
-  <p>La latencia P95 promedio de esta corrida es 1066.25 ms, muy cercana al baseline global de 1066 ms.</p>
+  <h3>Sin alertas críticas — avg P95: 951.55 ms</h3>
+  <p>La corrida actual muestra un P95 promedio de 951.55 ms, muy cercano al baseline de 952 ms, sin desviaciones significativas.</p>
 </div>
       
 <div class="conc-card" style="background:#ebf8ff;">
   <div class="icon">🔍</div>
   <div class="type">Investigar</div>
-  <h3>Latencia P95 estable — 1066.25 ms vs baseline 1066 ms</h3>
-  <p>Los samplers más lentos de esta corrida son: GET /reserve.php (1066.25 ms).</p>
+  <h3>Sin alertas críticas — avg P95: 951.55 ms vs baseline 952 ms</h3>
+  <p>El sistema opera dentro de los parámetros esperados. El sampler más lento es 'GET /reserve.php' con un P95 de 951.55 ms.</p>
 </div>
       
 <div class="conc-card" style="background:#f0fff4;">
   <div class="icon">⚡</div>
   <div class="type">Optimizar</div>
-  <h3>Optimización de alto impacto: GET /reserve.php</h3>
-  <p>El sampler 'GET /reserve.php' tiene un impact_score de 1,066, con un P95 de 1066.25 ms y 1 ejecución. Una reducción del 20% en su P95 representaría 213.2 ms de latencia acumulada evitada.</p>
+  <h3>Optimizar 'GET /reserve.php' — Impact Score 952</h3>
+  <p>El sampler 'GET /reserve.php' tiene el mayor impacto acumulado (952). Una reducción del 20% en su P95 (actual 951.55 ms) representaría 190.4 ms de latencia acumulada evitada.</p>
 </div>
     </div>
   </div>
@@ -189,16 +189,16 @@ tr:hover td { background: #f7fafc; }
     <span class="priority-badge badge-baja">BAJA</span>
   </div>
   <div>
-    <strong style="font-size:0.9rem;">Variabilidad dentro de parámetros normales</strong>
-    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">avg_p95 1066.25 ms vs baseline 1066 ms</p>
+    <strong style="font-size:0.9rem;">Sistema operando dentro de parámetros normales.</strong>
+    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">avg_p95 951.55ms vs baseline 952ms</p>
   </div>
 </li><li class="hyp-item">
   <div style="flex-shrink:0;padding-top:2px;">
     <span class="priority-badge badge-baja">BAJA</span>
   </div>
   <div>
-    <strong style="font-size:0.9rem;">Latencia en sampler GET /reserve.php</strong>
-    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">P95 1066.25 ms, payload 7.08 KB</p>
+    <strong style="font-size:0.9rem;">Ausencia de anomalías detectadas.</strong>
+    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">0 alertas, 0 outliers</p>
   </div>
 </li></ul>
 </div>
@@ -210,9 +210,19 @@ tr:hover td { background: #f7fafc; }
 <thead><tr><th>Prioridad</th><th>Acción</th><th>Sampler objetivo</th><th>Evidencia</th></tr></thead>
 <tbody><tr>
   <td><span class="p3">P3</span></td>
-  <td>Evaluar optimización de latencia para reducir impacto acumulado</td>
+  <td>Optimizar latencia P95 del sampler de mayor impacto.</td>
   <td class="label-cell" style="color:#718096;">GET /reserve.php</td>
-  <td style="color:#718096;font-size:0.8rem;">impact_score 1066, P95 1066.25 ms</td>
+  <td style="color:#718096;font-size:0.8rem;">P95 951.55ms, Impact Score 952</td>
+</tr><tr>
+  <td><span class="p3">P3</span></td>
+  <td>Mantener monitoreo continuo para detectar cambios en el comportamiento.</td>
+  <td class="label-cell" style="color:#718096;">—</td>
+  <td style="color:#718096;font-size:0.8rem;">Sistema HEALTHY, 0 alertas</td>
+</tr><tr>
+  <td><span class="p3">P3</span></td>
+  <td>Revisar la estabilidad del baseline global para asegurar su representatividad.</td>
+  <td class="label-cell" style="color:#718096;">—</td>
+  <td style="color:#718096;font-size:0.8rem;">avg_p95 951.55ms vs baseline 952ms</td>
 </tr></tbody>
 </table>
   </div>
@@ -248,7 +258,7 @@ tr:hover td { background: #f7fafc; }
 <tbody><tr>
   <td>1</td>
   <td class="label-cell">GET /reserve.php</td>
-  <td>1066 ms</td>
+  <td>952 ms</td>
   <td>7.1 KB</td>
 </tr></tbody>
 </table>
@@ -266,8 +276,8 @@ tr:hover td { background: #f7fafc; }
 <tbody><tr>
   <td>1</td>
   <td class="label-cell">GET /reserve.php</td>
-  <td><strong>1.066</strong></td>
-  <td>1066 ms</td>
+  <td><strong>952</strong></td>
+  <td>952 ms</td>
   <td>1</td>
 </tr></tbody>
 </table>
@@ -283,7 +293,7 @@ new Chart(ctx, {
     labels: ["2026-05-18"],
     datasets: [{
   label: 'avg P95 (ms)',
-  data: [1066.25],
+  data: [951.55],
   borderColor: '#4299e1',
   backgroundColor: 'rgba(66,153,225,0.1)',
   fill: true,
@@ -291,7 +301,7 @@ new Chart(ctx, {
   pointRadius: 4,
 },{
   label: 'Baseline global (ms)',
-  data: [1066],
+  data: [952],
   borderColor: '#a0aec0',
   borderDash: [6,3],
   fill: false,
