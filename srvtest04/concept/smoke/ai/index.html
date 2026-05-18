@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unitrade Performance — concept / srvtest04 / smoke</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+       background: #f7fafc; color: #2d3748; line-height: 1.5; }
+.header { background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+          color: white; padding: 28px 32px; }
+.header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; }
+.header .meta { font-size: 0.85rem; opacity: 0.75; display: flex; gap: 20px; flex-wrap: wrap; }
+.header .meta a { color: #90cdf4; text-decoration: none; }
+.status-badge { display: inline-block; padding: 4px 14px; border-radius: 20px;
+                font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 10px; }
+.container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+.section { background: white; border-radius: 12px; padding: 24px;
+           margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.section h2 { font-size: 1rem; font-weight: 700; color: #4a5568; text-transform: uppercase;
+              letter-spacing: 0.5px; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+.kpi-card { background: #f7fafc; border-radius: 10px; padding: 18px;
+            border: 1px solid #e2e8f0; text-align: center; }
+.kpi-card .value { font-size: 2rem; font-weight: 800; line-height: 1.1; }
+.kpi-card .label { font-size: 0.75rem; color: #718096; text-transform: uppercase;
+                   letter-spacing: 0.5px; margin-top: 4px; }
+.kpi-card .sub { font-size: 0.8rem; color: #a0aec0; margin-top: 2px; }
+.conc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.conc-card { border-radius: 10px; padding: 20px; border: 1px solid #e2e8f0; }
+.conc-card .icon { font-size: 1.6rem; margin-bottom: 8px; }
+.conc-card .type { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
+                   color: #718096; margin-bottom: 4px; }
+.conc-card h3 { font-size: 0.95rem; font-weight: 700; color: #2d3748; margin-bottom: 8px;
+                line-height: 1.3; }
+.conc-card p { font-size: 0.85rem; color: #4a5568; line-height: 1.5; }
+.bc-card { border-radius: 10px; padding: 20px; border: 2px solid; margin-bottom: 16px; }
+.bc-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.bc-emoji { font-size: 2rem; }
+.bc-title { font-size: 1.1rem; font-weight: 800; }
+.bc-sublabel { font-size: 0.8rem; opacity: 0.8; }
+.bc-desc { font-size: 0.85rem; line-height: 1.5; }
+.bc-reasoning { font-size: 0.8rem; margin-top: 8px; opacity: 0.7; font-style: italic; }
+.narrative { background: #f7fafc; border-left: 4px solid #4299e1;
+             padding: 14px 18px; border-radius: 0 8px 8px 0;
+             font-size: 0.9rem; line-height: 1.6; color: #4a5568; }
+.hyp-list { list-style: none; }
+.hyp-item { display: flex; gap: 12px; padding: 12px 0;
+            border-bottom: 1px solid #edf2f7; }
+.hyp-item:last-child { border-bottom: none; }
+.priority-badge { display: inline-block; padding: 2px 10px; border-radius: 12px;
+                  font-size: 0.7rem; font-weight: 700; white-space: nowrap; }
+.badge-alta { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+.badge-media { background: #fffff0; color: #b7791f; border: 1px solid #faf089; }
+.badge-baja { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th { background: #f7fafc; color: #4a5568; font-weight: 700; text-align: left;
+     padding: 10px 12px; border-bottom: 2px solid #e2e8f0; font-size: 0.75rem;
+     text-transform: uppercase; letter-spacing: 0.3px; }
+td { padding: 10px 12px; border-bottom: 1px solid #edf2f7; color: #4a5568; }
+tr:hover td { background: #f7fafc; }
+.level-2 td:first-child { border-left: 4px solid #e53e3e; }
+.level-1 td:first-child { border-left: 4px solid #d69e2e; }
+.level-0 td:first-child { border-left: 4px solid #38a169; }
+.dot-red { display: inline-block; width: 10px; height: 10px;
+           border-radius: 50%; background: #e53e3e; margin-right: 6px; }
+.dot-yellow { display: inline-block; width: 10px; height: 10px;
+              border-radius: 50%; background: #d69e2e; margin-right: 6px; }
+.dot-green { display: inline-block; width: 10px; height: 10px;
+             border-radius: 50%; background: #38a169; margin-right: 6px; }
+.ai-badge { display: inline-block; padding: 3px 12px; border-radius: 12px;
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;
+            background: #e9d8fd; color: #6b46c1; border: 1px solid #d6bcfa; }
+.algo-badge { background: #e2e8f0; color: #4a5568; border: 1px solid #cbd5e0; }
+.chart-container { position: relative; height: 260px; }
+.p1 { color: #c53030; font-weight: 700; }
+.p2 { color: #b7791f; font-weight: 700; }
+.p3 { color: #276749; font-weight: 700; }
+.label-cell { max-width: 320px; word-break: break-word; font-size: 0.82rem; }
+@media (max-width: 640px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .conc-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <span class="status-badge" style="background:#38a16922;color:#38a169;border:1px solid #38a16944;">
+      🟢 OK
+    </span>
+  </div>
+  <h1>Unitrade Performance — CONCEPT / srvtest04 / smoke</h1>
+  <div class="meta">
+    <span>Test: Smoke (~5 min) — Validación post-deploy</span>
+    <span>Run: 202605181947</span>
+    <span>Versión: build-35</span>
+    <span>2026-05-18 19:47 UTC</span>
+    
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- KPIs -->
+  <div class="section">
+    <h2>Estado de la corrida</h2>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="value" style="color:#4299e1;">1066</div>
+        <div class="label">avg P95 (ms)</div>
+        <div class="sub">Baseline: 1066 ms</div>
+      </div>
+      <div class="kpi-card">
+        <div class="value" style="color:#d69e2e;">+0.0%</div>
+        <div class="label">Δ vs baseline global</div>
+        <div class="sub">Últimas 50 corridas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="value" style="color:#38a169;">
+          0
+        </div>
+        <div class="label">Samplers con alerta</div>
+        <div class="sub">0 rojo · 0 amarillo</div>
+      </div>
+      <div class="kpi-card">
+        <div class="value" style="color:#38a169;">0</div>
+        <div class="label">Outliers</div>
+        <div class="sub">&gt; 3× baseline</div>
+      </div>
+      <div class="kpi-card">
+        <div class="value">1</div>
+        <div class="label">Corridas en historial</div>
+        <div class="sub">Últimas 1 procesadas</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clasificación + Conclusiones -->
+  <div class="section">
+    <h2>Análisis IA <span class="ai-badge" style="margin-left:8px;">Análisis con Gemini AI</span></h2>
+
+    <div class="bc-card" style="background:#f0fff4;border-color:#9ae6b4;">
+      <div class="bc-header">
+        <div class="bc-emoji">✅</div>
+        <div>
+          <div class="bc-title" style="color:#38a169;">HEALTHY</div>
+          <div class="bc-sublabel" style="color:#38a169;">Sistema saludable</div>
+        </div>
+      </div>
+      <div class="bc-desc">Todos los samplers operan dentro de sus rangos históricos normales en esta corrida.</div>
+      <div class="bc-reasoning">Sin alertas ni outliers en esta corrida.</div>
+    </div>
+
+    <div class="narrative" style="margin-bottom:20px;">La plataforma Unitrade se encuentra en un estado saludable, con un P95 promedio de 1066.25 ms, muy cercano al baseline de 1066 ms. No se detectaron alertas de semáforo ni samplers con comportamiento anómalo en esta corrida.</div>
+
+    <div class="conc-grid">
+      
+<div class="conc-card" style="background:#fff5f5;">
+  <div class="icon">🚨</div>
+  <div class="type">Escalar prioritario</div>
+  <h3>Sin alertas críticas — avg P95: 1066.25 ms</h3>
+  <p>La latencia P95 promedio de esta corrida es 1066.25 ms, muy cercana al baseline global de 1066 ms.</p>
+</div>
+      
+<div class="conc-card" style="background:#ebf8ff;">
+  <div class="icon">🔍</div>
+  <div class="type">Investigar</div>
+  <h3>Latencia P95 estable — 1066.25 ms vs baseline 1066 ms</h3>
+  <p>Los samplers más lentos de esta corrida son: GET /reserve.php (1066.25 ms).</p>
+</div>
+      
+<div class="conc-card" style="background:#f0fff4;">
+  <div class="icon">⚡</div>
+  <div class="type">Optimizar</div>
+  <h3>Optimización de alto impacto: GET /reserve.php</h3>
+  <p>El sampler 'GET /reserve.php' tiene un impact_score de 1,066, con un P95 de 1066.25 ms y 1 ejecución. Una reducción del 20% en su P95 representaría 213.2 ms de latencia acumulada evitada.</p>
+</div>
+    </div>
+  </div>
+
+  <!-- Hipótesis -->
+  <div class="section">
+  <h2>Hipótesis de causa raíz</h2>
+  <ul class="hyp-list"><li class="hyp-item">
+  <div style="flex-shrink:0;padding-top:2px;">
+    <span class="priority-badge badge-baja">BAJA</span>
+  </div>
+  <div>
+    <strong style="font-size:0.9rem;">Variabilidad dentro de parámetros normales</strong>
+    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">avg_p95 1066.25 ms vs baseline 1066 ms</p>
+  </div>
+</li><li class="hyp-item">
+  <div style="flex-shrink:0;padding-top:2px;">
+    <span class="priority-badge badge-baja">BAJA</span>
+  </div>
+  <div>
+    <strong style="font-size:0.9rem;">Latencia en sampler GET /reserve.php</strong>
+    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">P95 1066.25 ms, payload 7.08 KB</p>
+  </div>
+</li></ul>
+</div>
+
+  <!-- Recomendaciones -->
+  <div class="section">
+    <h2>Recomendaciones priorizadas</h2>
+    <table>
+<thead><tr><th>Prioridad</th><th>Acción</th><th>Sampler objetivo</th><th>Evidencia</th></tr></thead>
+<tbody><tr>
+  <td><span class="p3">P3</span></td>
+  <td>Evaluar optimización de latencia para reducir impacto acumulado</td>
+  <td class="label-cell" style="color:#718096;">GET /reserve.php</td>
+  <td style="color:#718096;font-size:0.8rem;">impact_score 1066, P95 1066.25 ms</td>
+</tr></tbody>
+</table>
+  </div>
+
+  <!-- Semáforo -->
+  <div class="section">
+    <h2>Semáforo de samplers</h2>
+    <p style='color:#718096;font-size:0.85rem;'>Sin alertas activas en esta corrida.</p>
+  </div>
+
+  <!-- Tendencia -->
+  <div class="section">
+    <h2>Tendencia avg P95 — últimas 1 corridas</h2>
+    <div class="chart-container">
+      <canvas id="trendChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Outliers -->
+  <div class="section">
+    <h2>Outliers de esta corrida</h2>
+    <p style='color:#718096;font-size:0.85rem;'>Sin outliers en esta corrida.</p>
+  </div>
+
+  <!-- Recurrencia -->
+  
+
+  <!-- Top 10 más lentos -->
+  <div class="section">
+    <h2>Top 10 samplers más lentos</h2>
+    <table>
+<thead><tr><th>#</th><th>Sampler</th><th>P95</th><th>Payload P95</th></tr></thead>
+<tbody><tr>
+  <td>1</td>
+  <td class="label-cell">GET /reserve.php</td>
+  <td>1066 ms</td>
+  <td>7.1 KB</td>
+</tr></tbody>
+</table>
+  </div>
+
+  <!-- Impact ranking -->
+  <div class="section">
+    <h2>Impact ranking (top 5 por impacto acumulado)</h2>
+    <p style="font-size:0.8rem;color:#718096;margin-bottom:12px;">
+      Impact score = P95 limpio × total de ejecuciones históricas.
+      Mide el peso acumulado de cada sampler en la performance global del sistema.
+    </p>
+    <table>
+<thead><tr><th>#</th><th>Sampler</th><th>Impact score</th><th>P95 limpio</th><th>Ejecuciones</th></tr></thead>
+<tbody><tr>
+  <td>1</td>
+  <td class="label-cell">GET /reserve.php</td>
+  <td><strong>1.066</strong></td>
+  <td>1066 ms</td>
+  <td>1</td>
+</tr></tbody>
+</table>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+const ctx = document.getElementById('trendChart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ["2026-05-18"],
+    datasets: [{
+  label: 'avg P95 (ms)',
+  data: [1066.25],
+  borderColor: '#4299e1',
+  backgroundColor: 'rgba(66,153,225,0.1)',
+  fill: true,
+  tension: 0.3,
+  pointRadius: 4,
+},{
+  label: 'Baseline global (ms)',
+  data: [1066],
+  borderColor: '#a0aec0',
+  borderDash: [6,3],
+  fill: false,
+  tension: 0.3,
+  pointRadius: 0,
+}]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+      tooltip: { mode: 'index', intersect: false }
+    },
+    scales: {
+      y: { beginAtZero: false, ticks: { callback: v => v + ' ms', font: { size: 11 } }, grid: { color: '#edf2f7' } },
+      x: { ticks: { font: { size: 11 } }, grid: { display: false } }
+    }
+  }
+});
+</script>
+</body>
+</html>

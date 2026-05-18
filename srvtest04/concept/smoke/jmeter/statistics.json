@@ -1,0 +1,34 @@
+{
+  "Total" : {
+    "transaction" : "Total",
+    "sampleCount" : 12,
+    "errorCount" : 0,
+    "errorPct" : 0.0,
+    "meanResTime" : 449.99999999999994,
+    "medianResTime" : 318.5,
+    "minResTime" : 280.0,
+    "maxResTime" : 1762.0,
+    "pct1ResTime" : 1382.5000000000014,
+    "pct2ResTime" : 1762.0,
+    "pct3ResTime" : 1762.0,
+    "throughput" : 0.986842105263158,
+    "receivedKBytesPerSec" : 6.9821006373355265,
+    "sentKBytesPerSec" : 0.12239155016447369
+  },
+  "GET /reserve.php" : {
+    "transaction" : "GET /reserve.php",
+    "sampleCount" : 12,
+    "errorCount" : 0,
+    "errorPct" : 0.0,
+    "meanResTime" : 449.99999999999994,
+    "medianResTime" : 318.5,
+    "minResTime" : 280.0,
+    "maxResTime" : 1762.0,
+    "pct1ResTime" : 1382.5000000000014,
+    "pct2ResTime" : 1762.0,
+    "pct3ResTime" : 1762.0,
+    "throughput" : 0.986842105263158,
+    "receivedKBytesPerSec" : 6.9821006373355265,
+    "sentKBytesPerSec" : 0.12239155016447369
+  }
+}
