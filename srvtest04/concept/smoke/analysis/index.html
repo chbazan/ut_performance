@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Unitrade Perf — concept / smoke / 20260518_1948</title>
+  <title>Unitrade Perf — concept / smoke / 20260520_1715</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <style>
@@ -26,7 +26,7 @@
       <small class="text-muted">
         Cliente: <strong>concept</strong> &nbsp;·&nbsp;
         Tipo: <strong>smoke</strong> &nbsp;·&nbsp;
-        Run: <strong>20260518_1948</strong>
+        Run: <strong>20260520_1715</strong>
       </small>
     </div>
     <span class="badge px-4 py-2 fs-6" style="background:#28a745">PASS</span>
@@ -38,7 +38,7 @@
       <div class="card kpi-card h-100" style="border-color:#0d6efd">
         <div class="card-body">
           <div class="text-muted small mb-1">Avg p95</div>
-          <div class="fs-2 fw-bold">951 <small class="fs-6 text-muted">ms</small></div>
+          <div class="fs-2 fw-bold">637 <small class="fs-6 text-muted">ms</small></div>
         </div>
       </div>
     </div>
@@ -46,7 +46,7 @@
       <div class="card kpi-card h-100" style="border-color:#6f42c1">
         <div class="card-body">
           <div class="text-muted small mb-1">Total Samples</div>
-          <div class="fs-2 fw-bold">10</div>
+          <div class="fs-2 fw-bold">11</div>
         </div>
       </div>
     </div>
@@ -62,7 +62,7 @@
       <div class="card kpi-card h-100" style="border-color:#fd7e14">
         <div class="card-body">
           <div class="text-muted small mb-1">Throughput</div>
-          <div class="fs-2 fw-bold">0.944 <small class="fs-6 text-muted">req/s</small></div>
+          <div class="fs-2 fw-bold">0.908 <small class="fs-6 text-muted">req/s</small></div>
         </div>
       </div>
     </div>
@@ -94,14 +94,14 @@
         <tr class="">
           <td class="fw-semibold"><code>GET /reserve.php</code></td>
           <td class="text-center"><span class="badge bg-success text-dark" style="font-size:.75rem">OK</span></td>
-          <td class="text-end">324</td>
-          <td class="text-end">699</td>
-          <td class="text-end fw-bold">951</td>
-          <td class="text-end">1153</td>
-          <td class="text-end">447.9</td>
+          <td class="text-end">301</td>
+          <td class="text-end">435</td>
+          <td class="text-end fw-bold">637</td>
+          <td class="text-end">799</td>
+          <td class="text-end">358.8</td>
           <td class="text-end ">0.0%</td>
-          <td class="text-end">0.944/s</td>
-          <td class="text-end"><span class="text-success">-11%</span></td>
+          <td class="text-end">0.908/s</td>
+          <td class="text-end"><span class="text-success">-37%</span></td>
           <td><small class="text-muted">—</small></td>
         </tr></tbody>
         </table>
@@ -150,7 +150,7 @@
   </div>
 
   <footer class="text-muted small text-end mt-2">
-    Generado: 2026-05-18 19:49:33 &nbsp;·&nbsp; performance-ut analyze.py
+    Generado: 2026-05-20 17:15:44 &nbsp;·&nbsp; performance-ut analyze.py
   </footer>
 </div>
 
@@ -162,12 +162,12 @@ const CHART_OPTS = {
 };
 new Chart('trendChart', {
   type: 'line',
-  data: {"labels": ["20260518_1944", "20260518_1948"], "datasets": [{"label": "GET /reserve.php", "data": [1066, 951], "borderColor": "#0d6efd", "backgroundColor": "#0d6efd22", "tension": 0.3, "fill": false, "pointRadius": 5, "pointHoverRadius": 7}]},
+  data: {"labels": ["20260518_1944", "20260518_1948", "20260520_1715"], "datasets": [{"label": "GET /reserve.php", "data": [1066, 951, 637], "borderColor": "#0d6efd", "backgroundColor": "#0d6efd22", "tension": 0.3, "fill": false, "pointRadius": 5, "pointHoverRadius": 7}]},
   options: { ...CHART_OPTS, scales: { y: { title: { display:true, text:'p95 (ms)' }, beginAtZero:false }, x:{} } }
 });
 new Chart('errChart', {
   type: 'line',
-  data: {"labels": ["20260518_1944", "20260518_1948"], "datasets": [{"label": "GET /reserve.php", "data": [0.0, 0.0], "borderColor": "#0d6efd", "backgroundColor": "#0d6efd22", "tension": 0.3, "fill": false, "pointRadius": 5}]},
+  data: {"labels": ["20260518_1944", "20260518_1948", "20260520_1715"], "datasets": [{"label": "GET /reserve.php", "data": [0.0, 0.0, 0.0], "borderColor": "#0d6efd", "backgroundColor": "#0d6efd22", "tension": 0.3, "fill": false, "pointRadius": 5}]},
   options: { ...CHART_OPTS, scales: { y: { title: { display:true, text:'Error Rate (%)' }, beginAtZero:true, min:0 }, x:{} } }
 });
 </script>

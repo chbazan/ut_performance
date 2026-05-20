@@ -14,20 +14,50 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 .header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; }
 .header .meta { font-size: 0.85rem; opacity: 0.75; display: flex; gap: 20px; flex-wrap: wrap; }
 .header .meta a { color: #90cdf4; text-decoration: none; }
+.header .meta a:hover { color: #bee3f8; }
 .status-badge { display: inline-block; padding: 4px 14px; border-radius: 20px;
                 font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 10px; }
 .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+/* Tabs */
+.tabs { display: flex; gap: 0; border-bottom: 2px solid #e2e8f0; margin-bottom: 24px; }
+.tab-btn { padding: 10px 28px; border: none; background: none; cursor: pointer;
+           font-size: 0.9rem; font-weight: 600; color: #718096;
+           border-bottom: 3px solid transparent; margin-bottom: -2px;
+           transition: color 0.15s, border-color 0.15s; }
+.tab-btn:hover { color: #4a5568; }
+.tab-btn.active { color: #2d3748; border-bottom-color: #4299e1; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+/* Sections */
 .section { background: white; border-radius: 12px; padding: 24px;
            margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
 .section h2 { font-size: 1rem; font-weight: 700; color: #4a5568; text-transform: uppercase;
               letter-spacing: 0.5px; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
-.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
 .kpi-card { background: #f7fafc; border-radius: 10px; padding: 18px;
-            border: 1px solid #e2e8f0; text-align: center; }
-.kpi-card .value { font-size: 2rem; font-weight: 800; line-height: 1.1; }
-.kpi-card .label { font-size: 0.75rem; color: #718096; text-transform: uppercase;
+            border: 1px solid #e2e8f0; text-align: center; position: relative; }
+.info-btn { position: absolute; top: 8px; right: 8px; width: 18px; height: 18px;
+            border-radius: 50%; background: #e2e8f0; color: #718096;
+            border: none; cursor: pointer; font-size: 0.68rem; font-weight: 700;
+            line-height: 18px; padding: 0; transition: background 0.15s, color 0.15s; }
+.info-btn:hover { background: #4299e1; color: white; }
+#kpi-popover { display: none; position: fixed; background: white;
+               border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 16px 14px;
+               box-shadow: 0 8px 28px rgba(0,0,0,0.18); max-width: 300px;
+               z-index: 9999; }
+.pop-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;
+             color: #2d3748; padding-right: 20px; }
+.pop-body { font-size: 0.82rem; line-height: 1.5; color: #4a5568; }
+.pop-verdict { margin-top: 10px; padding: 8px 10px; border-radius: 6px;
+               font-size: 0.82rem; line-height: 1.4; }
+.pop-close { position: absolute; top: 8px; right: 10px; background: none;
+             border: none; cursor: pointer; font-size: 1rem; color: #a0aec0;
+             line-height: 1; padding: 0; }
+.pop-close:hover { color: #4a5568; }
+.kpi-card .value { font-size: 1.9rem; font-weight: 800; line-height: 1.1; }
+.kpi-card .label { font-size: 0.72rem; color: #718096; text-transform: uppercase;
                    letter-spacing: 0.5px; margin-top: 4px; }
-.kpi-card .sub { font-size: 0.8rem; color: #a0aec0; margin-top: 2px; }
+.kpi-card .sub { font-size: 0.78rem; color: #a0aec0; margin-top: 2px; }
 .conc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
 .conc-card { border-radius: 10px; padding: 20px; border: 1px solid #e2e8f0; }
 .conc-card .icon { font-size: 1.6rem; margin-bottom: 8px; }
@@ -46,6 +76,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 .narrative { background: #f7fafc; border-left: 4px solid #4299e1;
              padding: 14px 18px; border-radius: 0 8px 8px 0;
              font-size: 0.9rem; line-height: 1.6; color: #4a5568; }
+.info-box { background: #ebf8ff; border-left: 4px solid #4299e1;
+            padding: 12px 16px; border-radius: 0 8px 8px 0;
+            font-size: 0.88rem; line-height: 1.5; color: #2c5282; margin-bottom: 14px; }
+.warn-box { background: #fffbeb; border-left: 4px solid #d69e2e;
+            padding: 12px 16px; border-radius: 0 8px 8px 0;
+            font-size: 0.88rem; line-height: 1.5; color: #744210; margin-bottom: 14px; }
 .hyp-list { list-style: none; }
 .hyp-item { display: flex; gap: 12px; padding: 12px 0;
             border-bottom: 1px solid #edf2f7; }
@@ -75,6 +111,8 @@ tr:hover td { background: #f7fafc; }
             background: #e9d8fd; color: #6b46c1; border: 1px solid #d6bcfa; }
 .algo-badge { background: #e2e8f0; color: #4a5568; border: 1px solid #cbd5e0; }
 .chart-container { position: relative; height: 260px; }
+.timeline-chart { position: relative; height: 220px; }
+.version-chart { position: relative; height: 200px; }
 .p1 { color: #c53030; font-weight: 700; }
 .p2 { color: #b7791f; font-weight: 700; }
 .p3 { color: #276749; font-weight: 700; }
@@ -82,246 +120,772 @@ tr:hover td { background: #f7fafc; }
 @media (max-width: 640px) {
   .kpi-grid { grid-template-columns: 1fr 1fr; }
   .conc-grid { grid-template-columns: 1fr; }
+  .tabs { overflow-x: auto; }
 }
 </style>
 </head>
 <body>
+
 <div class="header">
   <div>
     <span class="status-badge" style="background:#38a16922;color:#38a169;border:1px solid #38a16944;">
       🟢 OK
-    </span>
+    </span><span class="status-badge" style="background:#e53e3e22;color:#e53e3e;border:1px solid #e53e3e44;margin-left:8px;">❌ FAIL SLA</span>
   </div>
   <h1>Unitrade Performance — CONCEPT / srvtest04 / smoke</h1>
   <div class="meta">
     <span>Test: Smoke (~5 min) — Validación post-deploy</span>
-    <span>Run: 202605181950</span>
-    <span>Versión: build-36</span>
-    <span>2026-05-18 19:50 UTC</span>
+    <span>Run: 202605192057</span>
+    <span>Versión: local-test</span>
+    <span>2026-05-19 20:57 UTC</span>
+    <span>📊 <a href="https://chbazan.github.io/ut_performance/srvtest04/concept/smoke/jmeter/" target="_blank">Reporte JMeter</a></span>
     
   </div>
 </div>
 
 <div class="container">
 
-  <!-- KPIs -->
-  <div class="section">
-    <h2>Estado de la corrida</h2>
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="value" style="color:#4299e1;">952</div>
-        <div class="label">avg P95 (ms)</div>
-        <div class="sub">Baseline: 952 ms</div>
-      </div>
-      <div class="kpi-card">
-        <div class="value" style="color:#38a169;">-0.0%</div>
-        <div class="label">Δ vs baseline global</div>
-        <div class="sub">Últimas 50 corridas</div>
-      </div>
-      <div class="kpi-card">
-        <div class="value" style="color:#38a169;">
-          0
-        </div>
-        <div class="label">Samplers con alerta</div>
-        <div class="sub">0 rojo · 0 amarillo</div>
-      </div>
-      <div class="kpi-card">
-        <div class="value" style="color:#38a169;">0</div>
-        <div class="label">Outliers</div>
-        <div class="sub">&gt; 3× baseline</div>
-      </div>
-      <div class="kpi-card">
-        <div class="value">1</div>
-        <div class="label">Corridas en historial</div>
-        <div class="sub">Últimas 1 procesadas</div>
-      </div>
-    </div>
+  <div class="tabs">
+    <button class="tab-btn active" id="btn-ejecutivo" onclick="switchTab('ejecutivo')">📊 Ejecutivo</button>
+    <button class="tab-btn" id="btn-tecnico" onclick="switchTab('tecnico')">🔧 Técnico</button>
+    <button class="tab-btn" id="btn-historial" onclick="switchTab('historial')">📈 Historial</button>
   </div>
 
-  <!-- Clasificación + Conclusiones -->
-  <div class="section">
-    <h2>Análisis IA <span class="ai-badge" style="margin-left:8px;">Análisis con Gemini AI</span></h2>
+  <!-- ===== TAB: EJECUTIVO ===== -->
+  <div class="tab-pane active" id="pane-ejecutivo">
 
-    <div class="bc-card" style="background:#f0fff4;border-color:#9ae6b4;">
-      <div class="bc-header">
-        <div class="bc-emoji">✅</div>
-        <div>
-          <div class="bc-title" style="color:#38a169;">HEALTHY</div>
-          <div class="bc-sublabel" style="color:#38a169;">Sistema saludable</div>
+    <div class="section">
+      <h2>Estado de la corrida</h2>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <button class="info-btn" onclick="showKpiTip(this,'avg-p95')" title="¿Qué significa esto?">?</button>
+          <div class="value" style="color:#4299e1;">617</div>
+          <div class="label">avg P95 (ms)</div>
+          <div class="sub">Baseline: 894 ms</div>
         </div>
+        <div class="kpi-card">
+          <button class="info-btn" onclick="showKpiTip(this,'delta-baseline')" title="¿Qué significa esto?">?</button>
+          <div class="value" style="color:#38a169;">-31.0%</div>
+          <div class="label">Δ vs baseline global</div>
+          <div class="sub">Últimas 50 corridas</div>
+        </div>
+        <div class="kpi-card">
+  <button class="info-btn" onclick="showKpiTip(this,'apdex-global')" title="¿Qué significa esto?">?</button>
+  <div class="value" style="color:#38a169;">0.957</div>
+  <div class="label">APDEX global</div>
+  <div class="sub">T=1000 ms · Excellent</div>
+</div>
+        <div class="kpi-card">
+  <button class="info-btn" onclick="showKpiTip(this,'error-rate')" title="¿Qué significa esto?">?</button>
+  <div class="value" style="color:#d69e2e;">0.50%</div>
+  <div class="label">Error rate global</div>
+  <div class="sub">600 requests</div>
+</div>
+        <div class="kpi-card">
+          <button class="info-btn" onclick="showKpiTip(this,'alerts-count')" title="¿Qué significa esto?">?</button>
+          <div class="value" style="color:#38a169;">
+            0
+          </div>
+          <div class="label">Samplers con alerta</div>
+          <div class="sub">0 rojo · 0 amarillo</div>
+        </div>
+        <div class="kpi-card">
+          <button class="info-btn" onclick="showKpiTip(this,'outliers-count')" title="¿Qué significa esto?">?</button>
+          <div class="value" style="color:#38a169;">0</div>
+          <div class="label">Outliers</div>
+          <div class="sub">&gt; 3× baseline</div>
+        </div>
+        <div class="kpi-card">
+  <button class="info-btn" onclick="showKpiTip(this,'tps-real')" title="¿Qué significa esto?">?</button>
+  <div class="value" style="color:#38a169;">2.03</div>
+  <div class="label">TPS Real</div>
+  <div class="sub">Objetivo: 1.0/s · 203%</div>
+</div>
+        <div class="kpi-card">
+  <button class="info-btn" onclick="showKpiTip(this,'duration')" title="¿Qué significa esto?">?</button>
+  <div class="value" style="font-size:1.5rem;color:#4a5568;">5m 0s</div>
+  <div class="label">Duración del test</div>
+  <div class="sub">Medida por timeline</div>
+</div>
       </div>
-      <div class="bc-desc">Todos los samplers operan dentro de sus rangos históricos normales en esta corrida.</div>
-      <div class="bc-reasoning">Sin alertas ni outliers en esta corrida.</div>
     </div>
 
-    <div class="narrative" style="margin-bottom:20px;">El sistema se encuentra en un estado HEALTHY, operando con estabilidad. El P95 promedio de esta corrida es de 951.55 ms, muy cercano al baseline de 952 ms.</div>
+    <div class="section">
+      <h2>Clasificación <span class="ai-badge" style="margin-left:8px;">Análisis con Gemini AI</span></h2>
+      <div class="bc-card" style="background:#f0fff4;border-color:#9ae6b4;">
+        <div class="bc-header">
+          <div class="bc-emoji">✅</div>
+          <div>
+            <div class="bc-title" style="color:#38a169;">HEALTHY</div>
+            <div class="bc-sublabel" style="color:#38a169;">Sistema saludable</div>
+          </div>
+        </div>
+        <div class="bc-desc">Todos los samplers operan dentro de sus rangos históricos normales en esta corrida.</div>
+        <div class="bc-reasoning">Sin alertas ni outliers en esta corrida.</div>
+      </div>
+      <div class="narrative">La plataforma Unitrade se encuentra en un estado saludable, sin alertas de degradación ni outliers activos en esta corrida. El P95 promedio de la corrida fue de 616.71 ms, lo que representa una mejora significativa respecto al baseline global de 894 ms.</div>
+    </div>
 
-    <div class="conc-grid">
-      
+    
+
+    <div class="section">
+      <h2>Conclusiones</h2>
+      <div class="conc-grid">
+        
 <div class="conc-card" style="background:#fff5f5;">
   <div class="icon">🚨</div>
   <div class="type">Escalar prioritario</div>
-  <h3>Sin alertas críticas — avg P95: 951.55 ms</h3>
-  <p>La corrida actual muestra un P95 promedio de 951.55 ms, muy cercano al baseline de 952 ms, sin desviaciones significativas.</p>
+  <h3>Fallo de SLA en Liquidacion SOAP — Error Rate 3.33%</h3>
+  <p>El sampler 'Liquidacion SOAP' superó su umbral de error del 2.0%, registrando un 3.33% de errores. Esto indica un problema funcional o de servicio crítico.</p>
 </div>
-      
+        
 <div class="conc-card" style="background:#ebf8ff;">
   <div class="icon">🔍</div>
   <div class="type">Investigar</div>
-  <h3>Sin alertas críticas — avg P95: 951.55 ms vs baseline 952 ms</h3>
-  <p>El sistema opera dentro de los parámetros esperados. El sampler más lento es 'GET /reserve.php' con un P95 de 951.55 ms.</p>
+  <h3>Análisis de latencia — avg P95: 616.71 ms</h3>
+  <p>La corrida actual muestra un avg P95 de 616.71 ms, por debajo del baseline de 894 ms. Los samplers más lentos son Liquidacion SOAP (1867.1 ms), AltaOrden SOAP (1079.4 ms) y HistorialOrdenes REST (724.15 ms).</p>
 </div>
-      
+        
 <div class="conc-card" style="background:#f0fff4;">
   <div class="icon">⚡</div>
   <div class="type">Optimizar</div>
-  <h3>Optimizar 'GET /reserve.php' — Impact Score 952</h3>
-  <p>El sampler 'GET /reserve.php' tiene el mayor impacto acumulado (952). Una reducción del 20% en su P95 (actual 951.55 ms) representaría 190.4 ms de latencia acumulada evitada.</p>
+  <h3>Optimizar Liquidacion SOAP — Impact Score 1,867</h3>
+  <p>El sampler 'Liquidacion SOAP' tiene el mayor impacto acumulado (1,867). Una reducción del 20% en su P95 (1867.1 ms) representaría 373.4 ms de latencia acumulada evitada.</p>
 </div>
+      </div>
     </div>
-  </div>
 
-  <!-- Hipótesis -->
-  <div class="section">
+    <div class="section">
+      <h2>Recomendaciones priorizadas</h2>
+      <table>
+<thead><tr><th>Prioridad</th><th>Acción</th><th>Sampler objetivo</th><th>Evidencia</th></tr></thead>
+<tbody><tr>
+  <td><span class="p1">P1</span></td>
+  <td>Investigar y resolver la causa raíz de los errores HTTP 500.</td>
+  <td class="label-cell" style="color:#718096;">Liquidacion SOAP</td>
+  <td style="color:#718096;font-size:0.8rem;">Error rate 3.33% (umbral 2.0%)</td>
+</tr><tr>
+  <td><span class="p2">P2</span></td>
+  <td>Analizar y mitigar los errores HTTP 500 en el servicio de autenticación.</td>
+  <td class="label-cell" style="color:#718096;">Login REST</td>
+  <td style="color:#718096;font-size:0.8rem;">Error rate 1.67% (1 error)</td>
+</tr><tr>
+  <td><span class="p3">P3</span></td>
+  <td>Optimizar la latencia del servicio de alta de órdenes SOAP.</td>
+  <td class="label-cell" style="color:#718096;">AltaOrden SOAP</td>
+  <td style="color:#718096;font-size:0.8rem;">P95 de 1079.4 ms, segundo más lento y de alto impacto.</td>
+</tr></tbody>
+</table>
+    </div>
+
+  </div><!-- /pane-ejecutivo -->
+
+
+  <!-- ===== TAB: TÉCNICO ===== -->
+  <div class="tab-pane" id="pane-tecnico">
+
+    <div class="section">
+  <h2>SLA Compliance</h2>
+  <table>
+    <thead><tr>
+      <th>Sampler</th><th>P50</th>
+      <th>P95 Real</th><th>Threshold P95</th>
+      <th>P99 Real</th><th>Threshold P99</th>
+      <th>Error %</th><th>Threshold ER</th>
+      <th>Estado</th>
+    </tr></thead>
+    <tbody><tr>
+  <td class="label-cell">Liquidacion SOAP</td>
+  <td>1219 ms</td>
+  <td>1867 ms</td><td style='color:#38a169;font-weight:600'>5000 ms</td>
+  <td>2110 ms</td><td style='color:#38a169;font-weight:600'>15000 ms</td>
+  <td>3.33%</td><td style='color:#e53e3e;font-weight:600'>2.0%</td>
+  <td style="color:#e53e3e;font-weight:700">❌ FAIL</td>
+</tr><tr>
+  <td class="label-cell">AltaOrden SOAP</td>
+  <td>761 ms</td>
+  <td>1079 ms</td><td style='color:#38a169;font-weight:600'>5000 ms</td>
+  <td>1167 ms</td><td style='color:#38a169;font-weight:600'>15000 ms</td>
+  <td>0.00%</td><td style='color:#38a169;font-weight:600'>2.0%</td>
+  <td style="color:#38a169;font-weight:700">✅ PASS</td>
+</tr><tr>
+  <td class="label-cell">HistorialOrdenes REST</td>
+  <td>524 ms</td>
+  <td>724 ms</td><td style='color:#38a169;font-weight:600'>5000 ms</td>
+  <td>785 ms</td><td style='color:#38a169;font-weight:600'>15000 ms</td>
+  <td>0.00%</td><td style='color:#38a169;font-weight:600'>2.0%</td>
+  <td style="color:#38a169;font-weight:700">✅ PASS</td>
+</tr><tr>
+  <td class="label-cell">ConsultaCartera REST</td>
+  <td>420 ms</td>
+  <td>572 ms</td><td style='color:#38a169;font-weight:600'>5000 ms</td>
+  <td>590 ms</td><td style='color:#38a169;font-weight:600'>15000 ms</td>
+  <td>0.00%</td><td style='color:#38a169;font-weight:600'>2.0%</td>
+  <td style="color:#38a169;font-weight:700">✅ PASS</td>
+</tr><tr>
+  <td class="label-cell">ConsultaSaldo SOAP</td>
+  <td>332 ms</td>
+  <td>467 ms</td><td style='color:#38a169;font-weight:600'>5000 ms</td>
+  <td>504 ms</td><td style='color:#38a169;font-weight:600'>15000 ms</td>
+  <td>0.00%</td><td style='color:#38a169;font-weight:600'>2.0%</td>
+  <td style="color:#38a169;font-weight:700">✅ PASS</td>
+</tr><tr>
+  <td class="label-cell">AltaOrden REST</td>
+  <td>316 ms</td>
+  <td>427 ms</td><td style='color:#38a169;font-weight:600'>5000 ms</td>
+  <td>447 ms</td><td style='color:#38a169;font-weight:600'>15000 ms</td>
+  <td>0.00%</td><td style='color:#38a169;font-weight:600'>2.0%</td>
+  <td style="color:#38a169;font-weight:700">✅ PASS</td>
+</tr><tr>
+  <td class="label-cell">Valoracion REST</td>
+  <td>288 ms</td>
+  <td>368 ms</td><td style='color:#38a169;font-weight:600'>5000 ms</td>
+  <td>403 ms</td><td style='color:#38a169;font-weight:600'>15000 ms</td>
+  <td>0.00%</td><td style='color:#38a169;font-weight:600'>2.0%</td>
+  <td style="color:#38a169;font-weight:700">✅ PASS</td>
+</tr><tr>
+  <td class="label-cell">BusquedaEspecie REST</td>
+  <td>194 ms</td>
+  <td>252 ms</td><td style='color:#38a169;font-weight:600'>5000 ms</td>
+  <td>265 ms</td><td style='color:#38a169;font-weight:600'>15000 ms</td>
+  <td>0.00%</td><td style='color:#38a169;font-weight:600'>2.0%</td>
+  <td style="color:#38a169;font-weight:700">✅ PASS</td>
+</tr><tr>
+  <td class="label-cell">Login REST</td>
+  <td>178 ms</td>
+  <td>219 ms</td><td style='color:#38a169;font-weight:600'>5000 ms</td>
+  <td>232 ms</td><td style='color:#38a169;font-weight:600'>15000 ms</td>
+  <td>1.67%</td><td style='color:#38a169;font-weight:600'>2.0%</td>
+  <td style="color:#38a169;font-weight:700">✅ PASS</td>
+</tr><tr>
+  <td class="label-cell">ConsultaPrecio REST</td>
+  <td>154 ms</td>
+  <td>192 ms</td><td style='color:#38a169;font-weight:600'>5000 ms</td>
+  <td>201 ms</td><td style='color:#38a169;font-weight:600'>15000 ms</td>
+  <td>0.00%</td><td style='color:#38a169;font-weight:600'>2.0%</td>
+  <td style="color:#38a169;font-weight:700">✅ PASS</td>
+</tr>
+      <tr style="background:#fff5f5;">
+        <td colspan="8" style="text-align:right;font-weight:700;color:#4a5568;">Veredicto global</td>
+        <td style="color:#e53e3e;font-weight:700;font-size:1rem">❌ FAIL</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+    <div class="section">
+      <h2>Semáforo de samplers</h2>
+      <p style='color:#718096;font-size:0.85rem;'>Sin alertas ni mejoras en esta corrida.</p>
+    </div>
+
+    <div class="section">
+  <h2>APDEX por sampler</h2>
+  <div class="info-box">
+    <strong>T = 1000 ms</strong> — tiempo de respuesta considerado aceptable para el usuario.
+    Satisfied ≤ T &nbsp;|&nbsp; Tolerating ≤ 4T (4000 ms) &nbsp;|&nbsp; Frustrated &gt; 4T.
+    Score: Excellent ≥ 0.94 · Good ≥ 0.85 · Fair ≥ 0.70 · Poor ≥ 0.50 · Unacceptable &lt; 0.50.
+  </div>
+  <table>
+    <thead><tr><th>Sampler</th><th>P95</th><th>APDEX</th><th>Rating</th></tr></thead>
+    <tbody><tr>
+  <td class="label-cell">Liquidacion SOAP</td>
+  <td>1867 ms</td>
+  <td style="color:#e53e3e;font-weight:700">0.642</td>
+  <td style="color:#e53e3e">Poor</td>
+</tr><tr>
+  <td class="label-cell">AltaOrden SOAP</td>
+  <td>1079 ms</td>
+  <td style="color:#48bb78;font-weight:700">0.933</td>
+  <td style="color:#48bb78">Good</td>
+</tr><tr>
+  <td class="label-cell">AltaOrden REST</td>
+  <td>427 ms</td>
+  <td style="color:#38a169;font-weight:700">1.000</td>
+  <td style="color:#38a169">Excellent</td>
+</tr><tr>
+  <td class="label-cell">BusquedaEspecie REST</td>
+  <td>252 ms</td>
+  <td style="color:#38a169;font-weight:700">1.000</td>
+  <td style="color:#38a169">Excellent</td>
+</tr><tr>
+  <td class="label-cell">ConsultaCartera REST</td>
+  <td>572 ms</td>
+  <td style="color:#38a169;font-weight:700">1.000</td>
+  <td style="color:#38a169">Excellent</td>
+</tr><tr>
+  <td class="label-cell">ConsultaPrecio REST</td>
+  <td>192 ms</td>
+  <td style="color:#38a169;font-weight:700">1.000</td>
+  <td style="color:#38a169">Excellent</td>
+</tr><tr>
+  <td class="label-cell">ConsultaSaldo SOAP</td>
+  <td>467 ms</td>
+  <td style="color:#38a169;font-weight:700">1.000</td>
+  <td style="color:#38a169">Excellent</td>
+</tr><tr>
+  <td class="label-cell">HistorialOrdenes REST</td>
+  <td>724 ms</td>
+  <td style="color:#38a169;font-weight:700">1.000</td>
+  <td style="color:#38a169">Excellent</td>
+</tr><tr>
+  <td class="label-cell">Login REST</td>
+  <td>219 ms</td>
+  <td style="color:#38a169;font-weight:700">1.000</td>
+  <td style="color:#38a169">Excellent</td>
+</tr><tr>
+  <td class="label-cell">Valoracion REST</td>
+  <td>368 ms</td>
+  <td style="color:#38a169;font-weight:700">1.000</td>
+  <td style="color:#38a169">Excellent</td>
+</tr>
+      <tr style="background:#f7fafc;font-weight:700">
+        <td colspan="2" style="text-align:right;color:#4a5568;">APDEX global (promedio)</td>
+        <td style="color:#38a169">0.957</td>
+        <td style="color:#38a169">Excellent</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+    <div class="section">
+  <h2>Eficiencia de payload</h2>
+  <div class="info-box">ℹ️ La lentitud no viene del tamaño de las respuestas (avg 4.28 KB). Los endpoints más lentos no son lentos por el volumen de datos que devuelven — la demora está en el procesamiento del servidor (cálculos, consultas, etc.), no en la cantidad de información transferida.</div>
+  <table>
+    <thead><tr>
+      <th>Sampler</th><th>P95</th><th>Payload P95</th>
+      <th title="KB transferidos por segundo de latencia — no es throughput de red">KB/s de latencia</th>
+    </tr></thead>
+    <tbody><tr>
+  <td class="label-cell">Liquidacion SOAP</td>
+  <td>1867 ms</td>
+  <td>1.73 KB</td>
+  <td style="color:#718096;font-size:0.8rem;">0.93 KB/s</td>
+</tr><tr>
+  <td class="label-cell">AltaOrden SOAP</td>
+  <td>1079 ms</td>
+  <td>2.28 KB</td>
+  <td style="color:#718096;font-size:0.8rem;">2.11 KB/s</td>
+</tr><tr>
+  <td class="label-cell">HistorialOrdenes REST</td>
+  <td>724 ms</td>
+  <td>18.75 KB</td>
+  <td style="color:#718096;font-size:0.8rem;">25.89 KB/s</td>
+</tr><tr>
+  <td class="label-cell">ConsultaCartera REST</td>
+  <td>572 ms</td>
+  <td>8.95 KB</td>
+  <td style="color:#718096;font-size:0.8rem;">15.65 KB/s</td>
+</tr><tr>
+  <td class="label-cell">ConsultaSaldo SOAP</td>
+  <td>467 ms</td>
+  <td>4.65 KB</td>
+  <td style="color:#718096;font-size:0.8rem;">9.96 KB/s</td>
+</tr><tr>
+  <td class="label-cell">AltaOrden REST</td>
+  <td>427 ms</td>
+  <td>1.18 KB</td>
+  <td style="color:#718096;font-size:0.8rem;">2.77 KB/s</td>
+</tr><tr>
+  <td class="label-cell">Valoracion REST</td>
+  <td>368 ms</td>
+  <td>3.52 KB</td>
+  <td style="color:#718096;font-size:0.8rem;">9.58 KB/s</td>
+</tr><tr>
+  <td class="label-cell">BusquedaEspecie REST</td>
+  <td>252 ms</td>
+  <td>0.87 KB</td>
+  <td style="color:#718096;font-size:0.8rem;">3.45 KB/s</td>
+</tr><tr>
+  <td class="label-cell">Login REST</td>
+  <td>219 ms</td>
+  <td>0.56 KB</td>
+  <td style="color:#718096;font-size:0.8rem;">2.56 KB/s</td>
+</tr><tr>
+  <td class="label-cell">ConsultaPrecio REST</td>
+  <td>192 ms</td>
+  <td>0.30 KB</td>
+  <td style="color:#718096;font-size:0.8rem;">1.56 KB/s</td>
+</tr></tbody>
+  </table>
+</div>
+
+    <div class="section">
+  <h2>Timeline de la corrida (ventanas de 30s)</h2>
+  <div class="timeline-chart">
+    <canvas id="timelineChart"></canvas>
+  </div>
+</div>
+
+    <div class="section">
+      <h2>Outliers de esta corrida</h2>
+      <p style='color:#718096;font-size:0.85rem;'>Sin outliers en esta corrida.</p>
+    </div>
+
+    <div class="section">
+  <h2>Breakdown de errores</h2>
+  <p style="font-size:0.8rem;color:#718096;margin-bottom:12px;">
+    SOAP funcional = HTTP 200 con success=false (probable CodigoError ≠ 0).
+  </p>
+  <table>
+    <thead><tr><th>Sampler</th><th>Error %</th><th>Total errores</th><th>Por tipo</th></tr></thead>
+    <tbody><tr>
+  <td class="label-cell">Liquidacion SOAP</td>
+  <td style="color:#e53e3e;font-weight:600">3.33%</td>
+  <td>2</td>
+  <td style="font-size:0.8rem;color:#718096;">HTTP 500: 2</td>
+</tr><tr>
+  <td class="label-cell">Login REST</td>
+  <td style="color:#e53e3e;font-weight:600">1.67%</td>
+  <td>1</td>
+  <td style="font-size:0.8rem;color:#718096;">HTTP 500: 1</td>
+</tr></tbody>
+  </table>
+</div>
+
+    <div class="section">
+      <h2>Top 10 samplers más lentos</h2>
+      <table>
+<thead><tr><th>#</th><th>Sampler</th><th>P50</th><th>P95</th><th>P99</th><th>Payload P95</th></tr></thead>
+<tbody><tr>
+  <td>1</td>
+  <td class="label-cell">Liquidacion SOAP</td>
+  <td>1219 ms</td>
+  <td>1867 ms</td>
+  <td>2110 ms</td>
+  <td>1.7 KB</td>
+</tr><tr>
+  <td>2</td>
+  <td class="label-cell">AltaOrden SOAP</td>
+  <td>761 ms</td>
+  <td>1079 ms</td>
+  <td>1167 ms</td>
+  <td>2.3 KB</td>
+</tr><tr>
+  <td>3</td>
+  <td class="label-cell">HistorialOrdenes REST</td>
+  <td>524 ms</td>
+  <td>724 ms</td>
+  <td>785 ms</td>
+  <td>18.8 KB</td>
+</tr><tr>
+  <td>4</td>
+  <td class="label-cell">ConsultaCartera REST</td>
+  <td>420 ms</td>
+  <td>572 ms</td>
+  <td>590 ms</td>
+  <td>8.9 KB</td>
+</tr><tr>
+  <td>5</td>
+  <td class="label-cell">ConsultaSaldo SOAP</td>
+  <td>332 ms</td>
+  <td>467 ms</td>
+  <td>504 ms</td>
+  <td>4.7 KB</td>
+</tr><tr>
+  <td>6</td>
+  <td class="label-cell">AltaOrden REST</td>
+  <td>316 ms</td>
+  <td>427 ms</td>
+  <td>447 ms</td>
+  <td>1.2 KB</td>
+</tr><tr>
+  <td>7</td>
+  <td class="label-cell">Valoracion REST</td>
+  <td>288 ms</td>
+  <td>368 ms</td>
+  <td>403 ms</td>
+  <td>3.5 KB</td>
+</tr><tr>
+  <td>8</td>
+  <td class="label-cell">BusquedaEspecie REST</td>
+  <td>194 ms</td>
+  <td>252 ms</td>
+  <td>265 ms</td>
+  <td>0.9 KB</td>
+</tr><tr>
+  <td>9</td>
+  <td class="label-cell">Login REST</td>
+  <td>178 ms</td>
+  <td>219 ms</td>
+  <td>232 ms</td>
+  <td>0.6 KB</td>
+</tr><tr>
+  <td>10</td>
+  <td class="label-cell">ConsultaPrecio REST</td>
+  <td>154 ms</td>
+  <td>192 ms</td>
+  <td>201 ms</td>
+  <td>0.3 KB</td>
+</tr></tbody>
+</table>
+    </div>
+
+    <div class="section">
+      <h2>Impact ranking (top 5 por impacto acumulado)</h2>
+      <p style="font-size:0.8rem;color:#718096;margin-bottom:12px;">
+        Impact score = P95 limpio × total de ejecuciones históricas.
+        Mide el peso acumulado de cada sampler en la performance global del sistema.
+      </p>
+      <table>
+<thead><tr><th>#</th><th>Sampler</th><th>Impact score</th><th>P95 limpio</th><th>Ejecuciones</th></tr></thead>
+<tbody><tr>
+  <td>1</td>
+  <td class="label-cell">Liquidacion SOAP</td>
+  <td><strong>1.867</strong></td>
+  <td>1867 ms</td>
+  <td>1</td>
+</tr><tr>
+  <td>2</td>
+  <td class="label-cell">AltaOrden SOAP</td>
+  <td><strong>1.079</strong></td>
+  <td>1079 ms</td>
+  <td>1</td>
+</tr><tr>
+  <td>3</td>
+  <td class="label-cell">HistorialOrdenes REST</td>
+  <td><strong>724</strong></td>
+  <td>724 ms</td>
+  <td>1</td>
+</tr><tr>
+  <td>4</td>
+  <td class="label-cell">ConsultaCartera REST</td>
+  <td><strong>572</strong></td>
+  <td>572 ms</td>
+  <td>1</td>
+</tr><tr>
+  <td>5</td>
+  <td class="label-cell">ConsultaSaldo SOAP</td>
+  <td><strong>467</strong></td>
+  <td>467 ms</td>
+  <td>1</td>
+</tr></tbody>
+</table>
+    </div>
+
+    <div class="section">
   <h2>Hipótesis de causa raíz</h2>
   <ul class="hyp-list"><li class="hyp-item">
   <div style="flex-shrink:0;padding-top:2px;">
-    <span class="priority-badge badge-baja">BAJA</span>
+    <span class="priority-badge badge-alta">ALTA</span>
   </div>
   <div>
-    <strong style="font-size:0.9rem;">Sistema operando dentro de parámetros normales.</strong>
-    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">avg_p95 951.55ms vs baseline 952ms</p>
+    <strong style="font-size:0.9rem;">Errores HTTP 500 en servicios críticos.</strong>
+    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">Liquidacion SOAP con 3.33% de error y Login REST con 1.67% de error.</p>
+  </div>
+</li><li class="hyp-item">
+  <div style="flex-shrink:0;padding-top:2px;">
+    <span class="priority-badge badge-media">MEDIA</span>
+  </div>
+  <div>
+    <strong style="font-size:0.9rem;">Latencia elevada en Liquidacion SOAP.</strong>
+    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">P95 de 1867.1 ms, siendo el sampler más lento.</p>
   </div>
 </li><li class="hyp-item">
   <div style="flex-shrink:0;padding-top:2px;">
     <span class="priority-badge badge-baja">BAJA</span>
   </div>
   <div>
-    <strong style="font-size:0.9rem;">Ausencia de anomalías detectadas.</strong>
-    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">0 alertas, 0 outliers</p>
+    <strong style="font-size:0.9rem;">Variabilidad puntual en la performance.</strong>
+    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">Clasificación 'HEALTHY' con avg P95 de 616.71 ms, pero con errores aislados.</p>
   </div>
 </li></ul>
 </div>
 
-  <!-- Recomendaciones -->
-  <div class="section">
-    <h2>Recomendaciones priorizadas</h2>
-    <table>
-<thead><tr><th>Prioridad</th><th>Acción</th><th>Sampler objetivo</th><th>Evidencia</th></tr></thead>
-<tbody><tr>
-  <td><span class="p3">P3</span></td>
-  <td>Optimizar latencia P95 del sampler de mayor impacto.</td>
-  <td class="label-cell" style="color:#718096;">GET /reserve.php</td>
-  <td style="color:#718096;font-size:0.8rem;">P95 951.55ms, Impact Score 952</td>
-</tr><tr>
-  <td><span class="p3">P3</span></td>
-  <td>Mantener monitoreo continuo para detectar cambios en el comportamiento.</td>
-  <td class="label-cell" style="color:#718096;">—</td>
-  <td style="color:#718096;font-size:0.8rem;">Sistema HEALTHY, 0 alertas</td>
-</tr><tr>
-  <td><span class="p3">P3</span></td>
-  <td>Revisar la estabilidad del baseline global para asegurar su representatividad.</td>
-  <td class="label-cell" style="color:#718096;">—</td>
-  <td style="color:#718096;font-size:0.8rem;">avg_p95 951.55ms vs baseline 952ms</td>
-</tr></tbody>
-</table>
-  </div>
+  </div><!-- /pane-tecnico -->
 
-  <!-- Semáforo -->
-  <div class="section">
-    <h2>Semáforo de samplers</h2>
-    <p style='color:#718096;font-size:0.85rem;'>Sin alertas activas en esta corrida.</p>
-  </div>
 
-  <!-- Tendencia -->
-  <div class="section">
-    <h2>Tendencia avg P95 — últimas 1 corridas</h2>
-    <div class="chart-container">
-      <canvas id="trendChart"></canvas>
+  <!-- ===== TAB: HISTORIAL ===== -->
+  <div class="tab-pane" id="pane-historial">
+
+    <div class="section">
+      <h2>Tendencia avg P95 — últimas 5 corridas</h2>
+      <div class="chart-container">
+        <canvas id="trendChart"></canvas>
+      </div>
     </div>
-  </div>
 
-  <!-- Outliers -->
-  <div class="section">
-    <h2>Outliers de esta corrida</h2>
-    <p style='color:#718096;font-size:0.85rem;'>Sin outliers en esta corrida.</p>
+    <div class="section">
+  <h2>Tendencia P95 por versión</h2>
+  <p style="font-size:0.8rem;color:#718096;margin-bottom:12px;">
+    avg P95 promedio de todas las corridas registradas por versión.
+  </p>
+  <div class="version-chart">
+    <canvas id="versionTrendChart"></canvas>
   </div>
+</div>
 
-  <!-- Recurrencia -->
-  
+    
 
-  <!-- Top 10 más lentos -->
-  <div class="section">
-    <h2>Top 10 samplers más lentos</h2>
-    <table>
-<thead><tr><th>#</th><th>Sampler</th><th>P95</th><th>Payload P95</th></tr></thead>
-<tbody><tr>
-  <td>1</td>
-  <td class="label-cell">GET /reserve.php</td>
-  <td>952 ms</td>
-  <td>7.1 KB</td>
-</tr></tbody>
-</table>
-  </div>
+    
 
-  <!-- Impact ranking -->
-  <div class="section">
-    <h2>Impact ranking (top 5 por impacto acumulado)</h2>
-    <p style="font-size:0.8rem;color:#718096;margin-bottom:12px;">
-      Impact score = P95 limpio × total de ejecuciones históricas.
-      Mide el peso acumulado de cada sampler en la performance global del sistema.
-    </p>
-    <table>
-<thead><tr><th>#</th><th>Sampler</th><th>Impact score</th><th>P95 limpio</th><th>Ejecuciones</th></tr></thead>
-<tbody><tr>
-  <td>1</td>
-  <td class="label-cell">GET /reserve.php</td>
-  <td><strong>952</strong></td>
-  <td>952 ms</td>
-  <td>1</td>
-</tr></tbody>
-</table>
-  </div>
+  </div><!-- /pane-historial -->
 
 </div><!-- /container -->
 
+<div id="kpi-popover"></div>
+
 <script>
-const ctx = document.getElementById('trendChart').getContext('2d');
-new Chart(ctx, {
+// ---------------------------------------------------------------------------
+// KPI popover — tooltips contextuales en los cards del Ejecutivo
+// ---------------------------------------------------------------------------
+var _kpiTips = {"avg-p95": "<div class=\"pop-title\">P95 (Percentil 95)</div><div class=\"pop-body\"><strong>P95</strong> = tiempo de respuesta por debajo del cual se encuentran el 95% de las solicitudes. Es el indicador estándar de performance: ignora el 5% de picos extremos y refleja la experiencia real de la mayoría de los usuarios.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Corrida positiva: 617 ms está 31% por debajo del historial (894 ms). El sistema respondió más rápido que su promedio histórico.</div>", "delta-baseline": "<div class=\"pop-title\">Δ vs Baseline Global</div><div class=\"pop-body\">Compara el P95 de esta corrida contra el <strong>baseline global</strong> (promedio de las últimas 50 corridas). <strong>Negativo = más rápido</strong> que el historial. <strong>Positivo = más lento</strong>.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ 31% más rápido que el historial — resultado positivo.</div>", "apdex-global": "<div class=\"pop-title\">APDEX (Application Performance Index)</div><div class=\"pop-body\"><strong>APDEX</strong> mide qué porcentaje de usuarios tuvo una experiencia satisfactoria. T = 1000 ms (tiempo máximo aceptable).<br>✅ Excellent ≥ 0.94 · Good ≥ 0.85 · Fair ≥ 0.70 · Poor ≥ 0.50 · ❌ Unacceptable &lt; 0.50</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Excellent (0.957) — más del 94% de los usuarios tuvo tiempos de respuesta aceptables.</div>", "error-rate": "<div class=\"pop-title\">Error Rate Global</div><div class=\"pop-body\">Porcentaje de requests que fallaron (error HTTP, timeout, o error funcional). SLA estándar: <strong>&lt; 1%</strong>. En servicios SOAP, un HTTP 200 puede ocultar un error funcional (CodigoError ≠ 0).</div><div class=\"pop-verdict\" style=\"background:#fffbeb;border-left:3px solid #d69e2e;\">⚡ 0.50% en 600 requests — dentro del umbral del 1% pero hay errores. Revisar si son intermitentes o estructurales.</div>", "alerts-count": "<div class=\"pop-title\">Samplers con Alerta</div><div class=\"pop-body\">Cantidad de samplers (endpoints) cuyo P95 superó umbrales de alerta según el historial. <strong>Rojo</strong>: degradación persistente (más de una corrida consecutiva). <strong>Amarillo</strong>: degradación detectada solo en esta corrida.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Sin alertas — todos los endpoints respondieron dentro de sus rangos históricos normales.</div>", "outliers-count": "<div class=\"pop-title\">Outliers (Picos Extremos)</div><div class=\"pop-body\">Samplers con un P95 <strong>más de 3 veces mayor</strong> que su baseline histórico. Son picos extremos que indican comportamiento anómalo, no solo lentitud leve.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Sin outliers — no hubo picos extremos. Comportamiento estable y predecible en toda la corrida.</div>", "tps-real": "<div class=\"pop-title\">TPS (Transacciones por Segundo)</div><div class=\"pop-body\"><strong>TPS</strong> (Transactions Per Second) = requests procesadas por segundo. Mide la capacidad de throughput real del sistema bajo la carga del test.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Superó el objetivo: 2.03/s vs 1.0/s (203%). El servidor manejó más carga de la esperada sin degradarse.</div>", "duration": "<div class=\"pop-title\">Duración del Test</div><div class=\"pop-body\">Duración total medida desde el primer hasta el último request del JTL. Es la duración real del test, no el tiempo total del pipeline de CI/CD.</div><div class=\"pop-verdict\" style=\"background:#ebf8ff;border-left:3px solid #4299e1;\">ℹ️ El test procesó requests durante 5m 0s. Útil para calcular TPS y detectar fases de ramp-up/ramp-down.</div>"};
+var _popover = document.getElementById('kpi-popover');
+var _activeBtn = null;
+
+function showKpiTip(btn, tipId) {
+  if (_activeBtn === btn && _popover.style.display !== 'none') {
+    hidePopover(); return;
+  }
+  var tip = _kpiTips[tipId];
+  if (!tip) return;
+  _popover.innerHTML = tip + '<button class="pop-close" onclick="hidePopover()">✕</button>';
+  _popover.style.display = 'block';
+  var r = btn.getBoundingClientRect();
+  var pw = _popover.offsetWidth || 300;
+  var ph = _popover.offsetHeight || 160;
+  var left = r.right - pw;
+  if (left < 8) left = 8;
+  if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+  var top = r.bottom + 8;
+  if (top + ph > window.innerHeight - 8) top = r.top - ph - 8;
+  if (top < 8) top = 8;
+  _popover.style.left = left + 'px';
+  _popover.style.top = top + 'px';
+  _activeBtn = btn;
+}
+
+function hidePopover() {
+  _popover.style.display = 'none';
+  _activeBtn = null;
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.classList.contains('info-btn') && !_popover.contains(e.target)) {
+    hidePopover();
+  }
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') hidePopover();
+});
+
+// ---------------------------------------------------------------------------
+// Lazy chart init — los charts en tabs ocultos (display:none) tienen canvas
+// con dimensiones cero hasta que el tab se muestra por primera vez.
+// ---------------------------------------------------------------------------
+var _chartInits = {};
+var _chartInstances = {};
+
+function initChart(id, config) {
+  _chartInits[id] = config;
+}
+
+function initChartsInTab(paneId) {
+  var pane = document.getElementById(paneId);
+  if (!pane) return;
+  pane.querySelectorAll('canvas').forEach(function(canvas) {
+    var id = canvas.id;
+    if (_chartInits[id] && !_chartInstances[id]) {
+      _chartInstances[id] = new Chart(canvas.getContext('2d'), _chartInits[id]);
+      delete _chartInits[id];
+    }
+  });
+}
+
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-pane').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('pane-' + tabName).classList.add('active');
+  document.getElementById('btn-' + tabName).classList.add('active');
+  initChartsInTab('pane-' + tabName);
+}
+
+// Registrar chart configs
+initChart('trendChart', {
   type: 'line',
   data: {
-    labels: ["2026-05-18"],
+    labels: ["2026-05-19", "2026-05-19", "2026-05-19", "2026-05-19", "2026-05-19"],
     datasets: [{
-  label: 'avg P95 (ms)',
-  data: [951.55],
-  borderColor: '#4299e1',
-  backgroundColor: 'rgba(66,153,225,0.1)',
-  fill: true,
-  tension: 0.3,
-  pointRadius: 4,
-},{
-  label: 'Baseline global (ms)',
-  data: [952],
-  borderColor: '#a0aec0',
-  borderDash: [6,3],
-  fill: false,
-  tension: 0.3,
-  pointRadius: 0,
-}]
+      label: 'avg P95 (ms)',
+      data: [893.7, 893.7, 893.7, 893.7, 616.71],
+      borderColor: '#4299e1',
+      backgroundColor: 'rgba(66,153,225,0.1)',
+      fill: true, tension: 0.3, pointRadius: 4,
+    },{
+      label: 'Baseline global (ms)',
+      data: [894, 894, 894, 894, 894],
+      borderColor: '#a0aec0', borderDash: [6,3],
+      fill: false, tension: 0.3, pointRadius: 0,
+    }]
   },
   options: {
-    responsive: true,
-    maintainAspectRatio: false,
+    responsive: true, maintainAspectRatio: false,
     plugins: {
       legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
       tooltip: { mode: 'index', intersect: false }
     },
     scales: {
-      y: { beginAtZero: false, ticks: { callback: v => v + ' ms', font: { size: 11 } }, grid: { color: '#edf2f7' } },
+      y: { beginAtZero: false, ticks: { callback: function(v) { return v + ' ms'; }, font: { size: 11 } }, grid: { color: '#edf2f7' } },
       x: { ticks: { font: { size: 11 } }, grid: { display: false } }
     }
   }
 });
+
+initChart('timelineChart', {
+    type: 'line',
+    data: {
+      labels: ["0s", "30s", "60s", "90s", "120s", "150s", "180s", "210s", "240s", "270s"],
+      datasets: [
+        { label: 'P95 (ms)', data: [1186.0, 1268.1, 978.0, 1031.0, 1280.4, 1280.6, 1088.7, 1187.3, 1121.2, 1241.6], borderColor: '#e53e3e',
+           backgroundColor: 'rgba(229,62,62,0.08)', fill: true, tension: 0.3, pointRadius: 3, yAxisID: 'y' },
+        { label: 'P50 (ms)', data: [329.0, 358.0, 348.0, 292.0, 309.0, 330.5, 315.5, 330.5, 316.0, 313.5], borderColor: '#4299e1',
+           backgroundColor: 'transparent', fill: false, tension: 0.3, pointRadius: 3, borderDash: [4,2], yAxisID: 'y' },
+        { label: 'TPS', data: [2.0, 2.0, 2.03, 2.0, 1.97, 2.0, 2.0, 2.0, 2.0, 2.0], borderColor: '#38a169',
+           backgroundColor: 'transparent', fill: false, tension: 0.3, pointRadius: 3, yAxisID: 'y2' },
+        { label: 'Error %', data: [0.0, 0.0, 0.0, 0.0, 1.69, 0.0, 1.67, 0.0, 0.0, 1.67], borderColor: '#d69e2e',
+           backgroundColor: 'transparent', fill: false, tension: 0.1, pointRadius: 3, borderDash: [2,2], yAxisID: 'y2' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+                 tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        y: { position: 'left', ticks: { callback: v => v + ' ms', font: { size: 10 } }, grid: { color: '#edf2f7' } },
+        y2: { position: 'right', ticks: { font: { size: 10 } }, grid: { display: false } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
+initChart('versionTrendChart', {
+    type: 'bar',
+    data: {
+      labels: ["local-test"],
+      datasets: [{
+        label: 'avg P95 (ms)',
+        data: [838.3],
+        backgroundColor: ["#2b6cb0"],
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            afterLabel: function(ctx) {
+              var counts = [5];
+              return 'Corridas: ' + counts[ctx.dataIndex];
+            }
+          }
+        }
+      },
+      scales: {
+        y: { beginAtZero: false, ticks: { callback: v => v + ' ms', font: { size: 10 } }, grid: { color: '#edf2f7' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
 </script>
 </body>
 </html>
