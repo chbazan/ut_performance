@@ -135,9 +135,9 @@ tr:hover td { background: #f7fafc; }
   <h1>Unitrade Performance — CONCEPT / srvtest04 / smoke</h1>
   <div class="meta">
     <span>Test: Smoke (~5 min) — Validación post-deploy</span>
-    <span>Run: 202605201737</span>
-    <span>Versión: build-41</span>
-    <span>2026-05-20 17:37 UTC</span>
+    <span>Run: 202605201855</span>
+    <span>Versión: build-43</span>
+    <span>2026-05-20 18:55 UTC</span>
     <span>📊 <a href="https://chbazan.github.io/ut_performance/srvtest04/concept/smoke/jmeter/" target="_blank">Reporte JMeter</a></span>
     
   </div>
@@ -159,19 +159,19 @@ tr:hover td { background: #f7fafc; }
       <div class="kpi-grid">
         <div class="kpi-card">
           <button class="info-btn" onclick="showKpiTip(this,'avg-p95')" title="¿Qué significa esto?">?</button>
-          <div class="value" style="color:#4299e1;">637</div>
+          <div class="value" style="color:#4299e1;">730</div>
           <div class="label">avg P95 (ms)</div>
-          <div class="sub">Baseline: 838 ms</div>
+          <div class="sub">Baseline: 805 ms</div>
         </div>
         <div class="kpi-card">
           <button class="info-btn" onclick="showKpiTip(this,'delta-baseline')" title="¿Qué significa esto?">?</button>
-          <div class="value" style="color:#38a169;">-24.0%</div>
+          <div class="value" style="color:#38a169;">+9.3%</div>
           <div class="label">Δ vs baseline global</div>
           <div class="sub">Últimas 50 corridas</div>
         </div>
         <div class="kpi-card">
   <button class="info-btn" onclick="showKpiTip(this,'apdex-global')" title="¿Qué significa esto?">?</button>
-  <div class="value" style="color:#38a169;">1.000</div>
+  <div class="value" style="color:#38a169;">0.955</div>
   <div class="label">APDEX global</div>
   <div class="sub">T=1000 ms · Excellent</div>
 </div>
@@ -197,9 +197,9 @@ tr:hover td { background: #f7fafc; }
         </div>
         <div class="kpi-card">
   <button class="info-btn" onclick="showKpiTip(this,'tps-real')" title="¿Qué significa esto?">?</button>
-  <div class="value" style="color:#38a169;">0.98</div>
+  <div class="value" style="color:#38a169;">0.96</div>
   <div class="label">TPS Real</div>
-  <div class="sub">Objetivo: 1.0/s · 98%</div>
+  <div class="sub">Objetivo: 1.0/s · 96%</div>
 </div>
         <div class="kpi-card">
   <button class="info-btn" onclick="showKpiTip(this,'duration')" title="¿Qué significa esto?">?</button>
@@ -223,7 +223,7 @@ tr:hover td { background: #f7fafc; }
         <div class="bc-desc">Todos los samplers operan dentro de sus rangos históricos normales en esta corrida.</div>
         <div class="bc-reasoning">Sin alertas ni outliers en esta corrida.</div>
       </div>
-      <div class="narrative">El sistema se encuentra en un estado saludable, con un P95 promedio de 637.0 ms, por debajo del baseline de 838 ms. La mejora significativa en 'GET /reserve.php' confirma un impacto positivo del deploy actual.</div>
+      <div class="narrative">La plataforma Unitrade se encuentra en un estado saludable, sin alertas de degradación ni outliers detectados en la corrida actual. El promedio P95 de 730.5 ms se mantiene por debajo del baseline global de 805 ms.</div>
     </div>
 
     
@@ -235,22 +235,22 @@ tr:hover td { background: #f7fafc; }
 <div class="conc-card" style="background:#fff5f5;">
   <div class="icon">🚨</div>
   <div class="type">Escalar prioritario</div>
-  <h3>Sin alertas críticas — avg P95: 637.0 ms</h3>
-  <p>La corrida actual muestra un P95 promedio de 637.0 ms, lo cual está por debajo del baseline de 838 ms.</p>
+  <h3>Sin alertas críticas — avg P95: 730.5 ms</h3>
+  <p>La corrida actual (P95: 730.5 ms) se mantiene por debajo del baseline global (805 ms), sin samplers en estado de alerta ROJO o AMARILLO.</p>
 </div>
         
 <div class="conc-card" style="background:#ebf8ff;">
   <div class="icon">🔍</div>
   <div class="type">Investigar</div>
-  <h3>Tendencia de mejora sostenida en P95 — -28.7% de reducción</h3>
-  <p>El P95 promedio ha mostrado una tendencia a la baja del 28.7% en las últimas corridas, pasando de 893.7 ms a 637.0 ms. Esta mejora sostenida es un indicador positivo de la estabilidad del sistema.</p>
+  <h3>Tendencia de mejora sostenida — P95 redujo 18.3%</h3>
+  <p>El promedio P95 de las últimas corridas muestra una mejora sostenida del 18.3%, pasando de 893.7 ms a 730.5 ms. Esto indica una optimización general en la plataforma.</p>
 </div>
         
 <div class="conc-card" style="background:#f0fff4;">
   <div class="icon">⚡</div>
   <div class="type">Optimizar</div>
-  <h3>Optimización de 'GET /reserve.php' — Impacto acumulado de 4,468</h3>
-  <p>El sampler 'GET /reserve.php' es el principal candidato para optimización con un impact_score de 4,468 (P95 típico de 893.7 ms en 5 ejecuciones). Una reducción del 20% en su P95 representaría 893.6 ms de latencia acumulada evitada.</p>
+  <h3>Optimizar 'GET /reserve.php' — Impacto acumulado: 5,054</h3>
+  <p>El sampler 'GET /reserve.php' tiene el mayor impacto acumulado (5,054), con un P95 de 842.36 ms y 6 ejecuciones históricas. Una reducción del 20% en su P95 evitaría 1,010.8 ms de latencia acumulada.</p>
 </div>
       </div>
     </div>
@@ -261,19 +261,19 @@ tr:hover td { background: #f7fafc; }
 <thead><tr><th>Prioridad</th><th>Acción</th><th>Sampler objetivo</th><th>Evidencia</th></tr></thead>
 <tbody><tr>
   <td><span class="p3">P3</span></td>
-  <td>Analizar y optimizar el rendimiento del sampler 'GET /reserve.php'.</td>
+  <td>Optimizar latencia de operación crítica.</td>
   <td class="label-cell" style="color:#718096;">GET /reserve.php</td>
-  <td style="color:#718096;font-size:0.8rem;">Impact score de 4,468 y P95 típico de 893.7 ms.</td>
+  <td style="color:#718096;font-size:0.8rem;">Impact score: 5,054</td>
 </tr><tr>
   <td><span class="p3">P3</span></td>
-  <td>Monitorear la estabilidad de la mejora en 'GET /reserve.php' en futuras corridas.</td>
+  <td>Investigar regresión de latencia en versión 'local-test'.</td>
   <td class="label-cell" style="color:#718096;">GET /reserve.php</td>
-  <td style="color:#718096;font-size:0.8rem;">Reducción del 28.72% en P95 vs baseline global.</td>
+  <td style="color:#718096;font-size:0.8rem;">Regresión del 22.3% en P95 de 'local-test' vs 'build-43'</td>
 </tr><tr>
   <td><span class="p3">P3</span></td>
-  <td>Mantener la monitorización proactiva para asegurar la continuidad del estado saludable.</td>
+  <td>Revisar la representatividad de los samplers en tests de humo.</td>
   <td class="label-cell" style="color:#718096;">—</td>
-  <td style="color:#718096;font-size:0.8rem;">`bottleneck_class` es 'HEALTHY' y `overall_pass` es true.</td>
+  <td style="color:#718096;font-size:0.8rem;">Test de tipo 'smoke' con un único sampler lento.</td>
 </tr></tbody>
 </table>
     </div>
@@ -296,9 +296,9 @@ tr:hover td { background: #f7fafc; }
     </tr></thead>
     <tbody><tr>
   <td class="label-cell">GET /reserve.php</td>
-  <td>298 ms</td>
-  <td>637 ms</td><td style='color:#38a169;font-weight:600'>5000 ms</td>
-  <td>753 ms</td><td style='color:#38a169;font-weight:600'>15000 ms</td>
+  <td>283 ms</td>
+  <td>730 ms</td><td style='color:#38a169;font-weight:600'>5000 ms</td>
+  <td>955 ms</td><td style='color:#38a169;font-weight:600'>15000 ms</td>
   <td>0.00%</td><td style='color:#38a169;font-weight:600'>2.0%</td>
   <td style="color:#38a169;font-weight:700">✅ PASS</td>
 </tr>
@@ -311,26 +311,8 @@ tr:hover td { background: #f7fafc; }
 </div>
 
     <div class="section">
-      <h2>Semáforo de samplers · <span style="color:#38a169;font-size:0.85rem">1 mejora(s) detectada(s)</span></h2>
-      <table>
-<thead><tr>
-  <th>Sampler</th><th>Estado</th><th>P50</th><th>P95</th><th>P99</th>
-  <th>Baseline global</th><th>Δ vs baseline</th><th>Regresión</th><th>Error rate</th>
-  <th>APDEX</th>
-</tr></thead>
-<tbody><tr class="level-0">
-  <td class="label-cell"><span class="dot-green"></span>GET /reserve.php</td>
-  <td>VERDE ↓</td>
-  <td>298 ms</td>
-  <td>637 ms</td>
-  <td>753 ms</td>
-  <td>894 ms</td>
-  <td>-28.7%</td>
-  <td>-28.7%</td>
-  <td>0.0%</td>
-  <td style="color:#38a169;font-weight:600">1.000</td>
-</tr></tbody>
-</table>
+      <h2>Semáforo de samplers</h2>
+      <p style='color:#718096;font-size:0.85rem;'>Sin alertas ni mejoras en esta corrida.</p>
     </div>
 
     <div class="section">
@@ -344,13 +326,13 @@ tr:hover td { background: #f7fafc; }
     <thead><tr><th>Sampler</th><th>P95</th><th>APDEX</th><th>Rating</th></tr></thead>
     <tbody><tr>
   <td class="label-cell">GET /reserve.php</td>
-  <td>637 ms</td>
-  <td style="color:#38a169;font-weight:700">1.000</td>
+  <td>730 ms</td>
+  <td style="color:#38a169;font-weight:700">0.955</td>
   <td style="color:#38a169">Excellent</td>
 </tr>
       <tr style="background:#f7fafc;font-weight:700">
         <td colspan="2" style="text-align:right;color:#4a5568;">APDEX global (promedio)</td>
-        <td style="color:#38a169">1.000</td>
+        <td style="color:#38a169">0.955</td>
         <td style="color:#38a169">Excellent</td>
       </tr>
     </tbody>
@@ -363,13 +345,15 @@ tr:hover td { background: #f7fafc; }
   <table>
     <thead><tr>
       <th>Sampler</th><th>P95</th><th>Payload P95</th>
-      <th title="KB transferidos por segundo de latencia — no es throughput de red">KB/s de latencia</th>
+      <th title="KB transferidos por segundo de latencia — no es throughput de red">KB/s de latencia ⓘ</th>
+      <th title="Diagnóstico basado en el tamaño de respuesta vs la latencia observada">Diagnóstico ⓘ</th>
     </tr></thead>
     <tbody><tr>
   <td class="label-cell">GET /reserve.php</td>
-  <td>637 ms</td>
+  <td>730 ms</td>
   <td>7.08 KB</td>
-  <td style="color:#718096;font-size:0.8rem;">11.11 KB/s</td>
+  <td style="color:#718096;font-size:0.8rem;">9.69 KB/s</td>
+  <td style="font-size:0.78rem;color:#c05621;">Cuello en procesamiento — respuesta pequeña pero lenta → overhead en servidor</td>
 </tr></tbody>
   </table>
 </div>
@@ -379,6 +363,8 @@ tr:hover td { background: #f7fafc; }
   <div class="timeline-chart">
     <canvas id="timelineChart"></canvas>
   </div>
+  <p style="font-size:0.82rem;color:#718096;margin-top:10px;">
+  ℹ️ Corrida corta: solo una ventana de muestreo — no hay suficientes datos para detectar patrones temporales.</p>
 </div>
 
     <div class="section">
@@ -395,13 +381,47 @@ tr:hover td { background: #f7fafc; }
 <tbody><tr>
   <td>1</td>
   <td class="label-cell">GET /reserve.php</td>
-  <td>298 ms</td>
-  <td>637 ms</td>
-  <td>753 ms</td>
+  <td>283 ms</td>
+  <td>730 ms</td>
+  <td>955 ms</td>
   <td>7.1 KB</td>
 </tr></tbody>
 </table>
     </div>
+
+    <div class="section">
+  <h2>Distribución P50 / P95 / P99</h2>
+  <div class="info-box">
+    <strong>Dos ratios clave para entender la distribución:</strong><br>
+    • <strong>P95/P50</strong> — dispersión general: compara el usuario típico (P50) con el percentil 95.
+      Un valor de 3× significa que el 5% más lento espera 3 veces más que el usuario promedio.<br>
+    • <strong>P99/P95</strong> — longitud de la cola extrema: si es alto (&gt;2×), hay picos esporádicos
+      que el P95 no captura. Si es cercano a 1×, los peores casos están bien acotados.
+  </div>
+  <table>
+    <thead><tr>
+      <th>Sampler</th>
+      <th title="50% de los requests respondió en este tiempo o menos. Representa al usuario típico." style="text-align:right">P50 ⓘ</th>
+      <th title="95% de los requests respondió en este tiempo o menos. Estándar de performance." style="text-align:right">P95 ⓘ</th>
+      <th title="99% de los requests respondió en este tiempo o menos. Captura los peores casos." style="text-align:right">P99 ⓘ</th>
+      <th title="P95 ÷ P50 — qué tan amplia es la distribución. &gt;4× indica alta variabilidad." style="text-align:right">P95/P50 ⓘ</th>
+      <th title="P99 ÷ P95 — longitud de la cola extrema. &gt;2× sugiere picos esporádicos significativos." style="text-align:right">P99/P95 ⓘ</th>
+      <th>Tipo</th>
+      <th>Interpretación</th>
+    </tr></thead>
+    <tbody><tr>
+  <td class="label-cell">GET /reserve.php</td>
+  <td style="text-align:right">283 ms</td>
+  <td style="text-align:right">730 ms</td>
+  <td style="text-align:right">955 ms</td>
+  <td style="text-align:right;color:#718096">2.6×</td>
+  <td style="text-align:right;color:#718096">1.3×</td>
+  <td><span style="background:#ebf8ff;color:#2b6cb0;border:1px solid #2b6cb044;
+       padding:2px 8px;border-radius:8px;font-size:0.74rem;font-weight:700;white-space:nowrap;">NORMAL</span></td>
+  <td style="font-size:0.78rem;color:#4a5568">Variabilidad dentro de rangos esperados: P50 283 → P95 730 → P99 955 ms. No se detectan picos extremos ni bimodalidad.</td>
+</tr></tbody>
+  </table>
+</div>
 
     <div class="section">
       <h2>Impact ranking (top 5 por impacto acumulado)</h2>
@@ -414,9 +434,9 @@ tr:hover td { background: #f7fafc; }
 <tbody><tr>
   <td>1</td>
   <td class="label-cell">GET /reserve.php</td>
-  <td><strong>4.468</strong></td>
-  <td>894 ms</td>
-  <td>5</td>
+  <td><strong>5.054</strong></td>
+  <td>842 ms</td>
+  <td>6</td>
 </tr></tbody>
 </table>
     </div>
@@ -425,27 +445,27 @@ tr:hover td { background: #f7fafc; }
   <h2>Hipótesis de causa raíz</h2>
   <ul class="hyp-list"><li class="hyp-item">
   <div style="flex-shrink:0;padding-top:2px;">
-    <span class="priority-badge badge-alta">ALTA</span>
-  </div>
-  <div>
-    <strong style="font-size:0.9rem;">Mejora de rendimiento por optimizaciones recientes.</strong>
-    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">Sampler 'GET /reserve.php' muestra una reducción del 28.72% en P95 vs baseline global.</p>
-  </div>
-</li><li class="hyp-item">
-  <div style="flex-shrink:0;padding-top:2px;">
     <span class="priority-badge badge-media">MEDIA</span>
   </div>
   <div>
-    <strong style="font-size:0.9rem;">Estabilidad general del sistema.</strong>
-    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">`bottleneck_class` es 'HEALTHY' con 0 alertas rojas y amarillas.</p>
+    <strong style="font-size:0.9rem;">Optimización reciente de código/infraestructura.</strong>
+    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">bottleneck_class.trend_delta_pct de -18.3% en recent_runs.</p>
   </div>
 </li><li class="hyp-item">
   <div style="flex-shrink:0;padding-top:2px;">
     <span class="priority-badge badge-baja">BAJA</span>
   </div>
   <div>
-    <strong style="font-size:0.9rem;">Cumplimiento de SLAs y ausencia de errores.</strong>
-    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">`overall_pass` es true y `error_summary` está vacío.</p>
+    <strong style="font-size:0.9rem;">Carga de prueba no saturante.</strong>
+    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">tps_summary.actual 0.96 TPS en test 'smoke'.</p>
+  </div>
+</li><li class="hyp-item">
+  <div style="flex-shrink:0;padding-top:2px;">
+    <span class="priority-badge badge-baja">BAJA</span>
+  </div>
+  <div>
+    <strong style="font-size:0.9rem;">Variabilidad normal del sistema.</strong>
+    <p style="font-size:0.82rem;color:#718096;margin-top:3px;">bottleneck_class: HEALTHY, sin alertas.</p>
   </div>
 </li></ul>
 </div>
@@ -457,7 +477,7 @@ tr:hover td { background: #f7fafc; }
   <div class="tab-pane" id="pane-historial">
 
     <div class="section">
-      <h2>Tendencia avg P95 — últimas 6 corridas</h2>
+      <h2>Tendencia avg P95 — últimas 7 corridas</h2>
       <div class="chart-container">
         <canvas id="trendChart"></canvas>
       </div>
@@ -474,19 +494,19 @@ tr:hover td { background: #f7fafc; }
 </div>
 
     <div class="section">
-  <h2>Comparativa por release — build-41 → local-test</h2>
+  <h2>Comparativa por release — build-43 → local-test</h2>
   <p style="font-size:0.8rem;color:#718096;margin-bottom:12px;">
     P95 promedio por sampler entre versiones. Δ &gt; +10% = regresión · Δ &lt; -10% = mejora.
   </p>
   <table>
     <thead><tr>
-      <th>Sampler</th><th>P95 build-41</th><th>P95 local-test</th><th>Δ</th>
+      <th>Sampler</th><th>P95 build-43</th><th>P95 local-test</th><th>Δ</th>
     </tr></thead>
     <tbody><tr>
   <td class="label-cell">GET /reserve.php</td>
-  <td>637 ms</td>
+  <td>730 ms</td>
   <td>894 ms</td>
-  <td style="color:#e53e3e;font-weight:600">↑ +40.3%</td>
+  <td style="color:#e53e3e;font-weight:600">↑ +22.3%</td>
 </tr></tbody>
   </table>
 </div>
@@ -503,7 +523,7 @@ tr:hover td { background: #f7fafc; }
 // ---------------------------------------------------------------------------
 // KPI popover — tooltips contextuales en los cards del Ejecutivo
 // ---------------------------------------------------------------------------
-var _kpiTips = {"avg-p95": "<div class=\"pop-title\">P95 (Percentil 95)</div><div class=\"pop-body\"><strong>P95</strong> = tiempo de respuesta por debajo del cual se encuentran el 95% de las solicitudes. Es el indicador estándar de performance: ignora el 5% de picos extremos y refleja la experiencia real de la mayoría de los usuarios.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Corrida positiva: 637 ms está 24% por debajo del historial (838 ms). El sistema respondió más rápido que su promedio histórico.</div>", "delta-baseline": "<div class=\"pop-title\">Δ vs Baseline Global</div><div class=\"pop-body\">Compara el P95 de esta corrida contra el <strong>baseline global</strong> (promedio de las últimas 50 corridas). <strong>Negativo = más rápido</strong> que el historial. <strong>Positivo = más lento</strong>.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ 24% más rápido que el historial — resultado positivo.</div>", "apdex-global": "<div class=\"pop-title\">APDEX (Application Performance Index)</div><div class=\"pop-body\"><strong>APDEX</strong> mide qué porcentaje de usuarios tuvo una experiencia satisfactoria. T = 1000 ms (tiempo máximo aceptable).<br>✅ Excellent ≥ 0.94 · Good ≥ 0.85 · Fair ≥ 0.70 · Poor ≥ 0.50 · ❌ Unacceptable &lt; 0.50</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Excellent (1.000) — más del 94% de los usuarios tuvo tiempos de respuesta aceptables.</div>", "error-rate": "<div class=\"pop-title\">Error Rate Global</div><div class=\"pop-body\">Porcentaje de requests que fallaron (error HTTP, timeout, o error funcional). SLA estándar: <strong>&lt; 1%</strong>. En servicios SOAP, un HTTP 200 puede ocultar un error funcional (CodigoError ≠ 0).</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Sin errores en 11 requests — todas las requests completaron exitosamente.</div>", "alerts-count": "<div class=\"pop-title\">Samplers con Alerta</div><div class=\"pop-body\">Cantidad de samplers (endpoints) cuyo P95 superó umbrales de alerta según el historial. <strong>Rojo</strong>: degradación persistente (más de una corrida consecutiva). <strong>Amarillo</strong>: degradación detectada solo en esta corrida.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Sin alertas — todos los endpoints respondieron dentro de sus rangos históricos normales.</div>", "outliers-count": "<div class=\"pop-title\">Outliers (Picos Extremos)</div><div class=\"pop-body\">Samplers con un P95 <strong>más de 3 veces mayor</strong> que su baseline histórico. Son picos extremos que indican comportamiento anómalo, no solo lentitud leve.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Sin outliers — no hubo picos extremos. Comportamiento estable y predecible en toda la corrida.</div>", "tps-real": "<div class=\"pop-title\">TPS (Transacciones por Segundo)</div><div class=\"pop-body\"><strong>TPS</strong> (Transactions Per Second) = requests procesadas por segundo. Mide la capacidad de throughput real del sistema bajo la carga del test.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #48bb78;\">✅ Cerca del objetivo: 0.98/s (98% del objetivo de 1.0/s).</div>", "duration": "<div class=\"pop-title\">Duración del Test</div><div class=\"pop-body\">Duración total medida desde el primer hasta el último request del JTL. Es la duración real del test, no el tiempo total del pipeline de CI/CD.</div><div class=\"pop-verdict\" style=\"background:#ebf8ff;border-left:3px solid #4299e1;\">ℹ️ El test procesó requests durante 30s. Útil para calcular TPS y detectar fases de ramp-up/ramp-down.</div>"};
+var _kpiTips = {"avg-p95": "<div class=\"pop-title\">P95 (Percentil 95)</div><div class=\"pop-body\"><strong>P95</strong> = tiempo de respuesta por debajo del cual se encuentran el 95% de las solicitudes. Es el indicador estándar de performance: ignora el 5% de picos extremos y refleja la experiencia real de la mayoría de los usuarios.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Dentro del rango normal: 730 ms vs historial 805 ms.</div>", "delta-baseline": "<div class=\"pop-title\">Δ vs Baseline Global</div><div class=\"pop-body\">Compara el P95 de esta corrida contra el <strong>baseline global</strong> (promedio de las últimas 50 corridas). <strong>Positivo = más rápido</strong> que el historial. <strong>Negativo = más lento</strong>.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ 9% más rápido que el historial.</div>", "apdex-global": "<div class=\"pop-title\">APDEX (Application Performance Index)</div><div class=\"pop-body\"><strong>APDEX</strong> mide qué porcentaje de usuarios tuvo una experiencia satisfactoria. T = 1000 ms (tiempo máximo aceptable).<br>✅ Excellent ≥ 0.94 · Good ≥ 0.85 · Fair ≥ 0.70 · Poor ≥ 0.50 · ❌ Unacceptable &lt; 0.50</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Excellent (0.955) — más del 94% de los usuarios tuvo tiempos de respuesta aceptables.</div>", "error-rate": "<div class=\"pop-title\">Error Rate Global</div><div class=\"pop-body\">Porcentaje de requests que fallaron (error HTTP, timeout, o error funcional). SLA estándar: <strong>&lt; 1%</strong>. En servicios SOAP, un HTTP 200 puede ocultar un error funcional (CodigoError ≠ 0).</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Sin errores en 11 requests — todas las requests completaron exitosamente.</div>", "alerts-count": "<div class=\"pop-title\">Samplers con Alerta</div><div class=\"pop-body\">Cantidad de samplers (endpoints) cuyo P95 superó umbrales de alerta según el historial. <strong>Rojo</strong>: degradación persistente (más de una corrida consecutiva). <strong>Amarillo</strong>: degradación detectada solo en esta corrida.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Sin alertas — todos los endpoints respondieron dentro de sus rangos históricos normales.</div>", "outliers-count": "<div class=\"pop-title\">Outliers (Picos Extremos)</div><div class=\"pop-body\">Samplers con un P95 <strong>más de 3 veces mayor</strong> que su baseline histórico. Son picos extremos que indican comportamiento anómalo, no solo lentitud leve.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #38a169;\">✅ Sin outliers — no hubo picos extremos. Comportamiento estable y predecible en toda la corrida.</div>", "tps-real": "<div class=\"pop-title\">TPS (Transacciones por Segundo)</div><div class=\"pop-body\"><strong>TPS</strong> (Transactions Per Second) = requests procesadas por segundo. Mide la capacidad de throughput real del sistema bajo la carga del test.</div><div class=\"pop-verdict\" style=\"background:#f0fff4;border-left:3px solid #48bb78;\">✅ Cerca del objetivo: 0.96/s (96% del objetivo de 1.0/s).</div>", "duration": "<div class=\"pop-title\">Duración del Test</div><div class=\"pop-body\">Duración total medida desde el primer hasta el último request del JTL. Es la duración real del test, no el tiempo total del pipeline de CI/CD.</div><div class=\"pop-verdict\" style=\"background:#ebf8ff;border-left:3px solid #4299e1;\">ℹ️ El test procesó requests durante 30s. Útil para calcular TPS y detectar fases de ramp-up/ramp-down.</div>"};
 var _popover = document.getElementById('kpi-popover');
 var _activeBtn = null;
 
@@ -578,16 +598,16 @@ function switchTab(tabName) {
 initChart('trendChart', {
   type: 'line',
   data: {
-    labels: ["2026-05-19", "2026-05-19", "2026-05-19", "2026-05-19", "2026-05-19", "2026-05-20"],
+    labels: ["2026-05-19", "2026-05-19", "2026-05-19", "2026-05-19", "2026-05-19", "2026-05-20", "2026-05-20"],
     datasets: [{
       label: 'avg P95 (ms)',
-      data: [893.7, 893.7, 893.7, 893.7, 616.71, 637.0],
+      data: [893.7, 893.7, 893.7, 893.7, 616.71, 637.0, 730.5],
       borderColor: '#4299e1',
       backgroundColor: 'rgba(66,153,225,0.1)',
       fill: true, tension: 0.3, pointRadius: 4,
     },{
       label: 'Baseline global (ms)',
-      data: [894, 894, 894, 894, 894, 838],
+      data: [894, 894, 894, 894, 894, 838, 805],
       borderColor: '#a0aec0', borderDash: [6,3],
       fill: false, tension: 0.3, pointRadius: 0,
     }]
@@ -610,9 +630,9 @@ initChart('timelineChart', {
     data: {
       labels: ["0s"],
       datasets: [
-        { label: 'P95 (ms)', data: [637.0], borderColor: '#e53e3e',
+        { label: 'P95 (ms)', data: [730.5], borderColor: '#e53e3e',
            backgroundColor: 'rgba(229,62,62,0.08)', fill: true, tension: 0.3, pointRadius: 3, yAxisID: 'y' },
-        { label: 'P50 (ms)', data: [298.0], borderColor: '#4299e1',
+        { label: 'P50 (ms)', data: [283.0], borderColor: '#4299e1',
            backgroundColor: 'transparent', fill: false, tension: 0.3, pointRadius: 3, borderDash: [4,2], yAxisID: 'y' },
         { label: 'TPS', data: [0.37], borderColor: '#38a169',
            backgroundColor: 'transparent', fill: false, tension: 0.3, pointRadius: 3, yAxisID: 'y2' },
@@ -634,11 +654,11 @@ initChart('timelineChart', {
 initChart('versionTrendChart', {
     type: 'bar',
     data: {
-      labels: ["build-41", "local-test"],
+      labels: ["build-41", "build-43", "local-test"],
       datasets: [{
         label: 'avg P95 (ms)',
-        data: [637.0, 838.3],
-        backgroundColor: ["#4299e1", "#2b6cb0"],
+        data: [637.0, 730.5, 838.3],
+        backgroundColor: ["#4299e1", "#4299e1", "#2b6cb0"],
         borderRadius: 6,
       }]
     },
@@ -649,7 +669,7 @@ initChart('versionTrendChart', {
         tooltip: {
           callbacks: {
             afterLabel: function(ctx) {
-              var counts = [1, 5];
+              var counts = [1, 1, 5];
               return 'Corridas: ' + counts[ctx.dataIndex];
             }
           }
