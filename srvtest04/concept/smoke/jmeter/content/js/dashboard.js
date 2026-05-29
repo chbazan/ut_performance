@@ -173,7 +173,7 @@ $(document).ready(function() {
     });
 
     // Creates APDEX table
-    createTable($("#apdexTable"), {"supportsControllersDiscrimination": true, "overall": {"data": [0.8636363636363636, 500, 1500, "Total"], "isController": false}, "titles": ["Apdex", "T (Toleration threshold)", "F (Frustration threshold)", "Label"], "items": [{"data": [0.8636363636363636, 500, 1500, "GET /reserve.php"], "isController": false}]}, function(index, item){
+    createTable($("#apdexTable"), {"supportsControllersDiscrimination": true, "overall": {"data": [0.9090909090909091, 500, 1500, "Total"], "isController": false}, "titles": ["Apdex", "T (Toleration threshold)", "F (Frustration threshold)", "Label"], "items": [{"data": [0.9090909090909091, 500, 1500, "GET /reserve.php"], "isController": false}]}, function(index, item){
         switch(index){
             case 0:
                 item = item.toFixed(3);
@@ -187,7 +187,7 @@ $(document).ready(function() {
     }, [[0, 0]], 3);
 
     // Create statistics table
-    createTable($("#statisticsTable"), {"supportsControllersDiscrimination": true, "overall": {"data": ["Total", 11, 0, 0.0, 502.9090909090909, 298, 2148, 318.0, 1831.2000000000012, 2148.0, 2148.0, 0.9396890483512728, 6.650819424867589, 0.11654346595762857], "isController": false}, "titles": ["Label", "#Samples", "FAIL", "Error %", "Average", "Min", "Max", "Median", "90th pct", "95th pct", "99th pct", "Transactions/s", "Received", "Sent"], "items": [{"data": ["GET /reserve.php", 11, 0, 0.0, 502.9090909090909, 298, 2148, 318.0, 1831.2000000000012, 2148.0, 2148.0, 0.9396890483512728, 6.650819424867589, 0.11654346595762857], "isController": false}]}, function(index, item){
+    createTable($("#statisticsTable"), {"supportsControllersDiscrimination": true, "overall": {"data": ["Total", 11, 0, 0.0, 423.0, 294, 1336, 312.0, 1169.0000000000005, 1336.0, 1336.0, 0.9091660467807257, 6.435110210554591, 0.1127578983800314], "isController": false}, "titles": ["Label", "#Samples", "FAIL", "Error %", "Average", "Min", "Max", "Median", "90th pct", "95th pct", "99th pct", "Transactions/s", "Received", "Sent"], "items": [{"data": ["GET /reserve.php", 11, 0, 0.0, 423.0, 294, 1336, 312.0, 1169.0000000000005, 1336.0, 1336.0, 0.9091660467807257, 6.435110210554591, 0.1127578983800314], "isController": false}]}, function(index, item){
         switch(index){
             // Errors pct
             case 3:
