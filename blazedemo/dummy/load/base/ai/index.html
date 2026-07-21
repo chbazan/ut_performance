@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unitrade Performance — dummy / blazedemo / load</title>
+<script>
+(function() {
+  var saved = null;
+  try { saved = localStorage.getItem('ut-theme'); } catch (e) {}
+  document.documentElement.setAttribute('data-theme', saved === 'dark' ? 'dark' : 'light');
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ==========================================================================
+   Design tokens
+   ========================================================================== */
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px;
+
+  --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px; --radius-pill: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(15,23,42,0.06), 0 1px 1px rgba(15,23,42,0.04);
+  --shadow-md: 0 4px 12px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.05);
+  --shadow-lg: 0 16px 36px rgba(15,23,42,0.16);
+
+  --bg-page: #eef1f6;
+  --bg-page-sticky: rgba(238,241,246,0.85);
+  --bg-surface: #ffffff;
+  --bg-recessed: #f8fafc;
+  --bg-zebra: #fbfcfe;
+  --bg-header-from: #1e2536;
+  --bg-header-to: #10141f;
+  --header-glow: rgba(99,102,241,0.42);
+  --header-hairline: rgba(255,255,255,0.14);
+  --header-chip: rgba(255,255,255,0.09);
+  --border: #e2e8f0;
+  --border-strong: #cbd5e0;
+  --border-subtle: #edf2f7;
+
+  /* Brand accent — distinto de los colores semánticos de estado */
+  --brand: #6366f1;
+  --brand-strong: #4f46e5;
+  --brand-bg: rgba(99,102,241,0.09);
+
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+  --text-faint: #a0aec0;
+  --text-inverse: #f7fafc;
+  --text-inverse-muted: rgba(247,250,252,0.72);
+
+  --color-critical: #e53e3e;
+  --color-critical-strong: #c53030;
+  --color-critical-bg: #fff5f5;
+  --color-critical-border: #feb2b2;
+  --color-critical-tint-bg: rgba(229,62,62,0.12);
+  --color-critical-tint-border: rgba(229,62,62,0.35);
+
+  --color-warning: #d69e2e;
+  --color-warning-strong: #b7791f;
+  --color-warning-ink: #744210;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #faf089;
+  --color-warning-tint-bg: rgba(214,158,46,0.14);
+  --color-warning-tint-border: rgba(214,158,46,0.38);
+
+  --color-ok: #38a169;
+  --color-ok-strong: #276749;
+  --color-ok-bg: #f0fff4;
+  --color-ok-border: #9ae6b4;
+  --color-ok-tint-bg: rgba(56,161,105,0.12);
+  --color-ok-tint-border: rgba(56,161,105,0.35);
+
+  --color-info: #4299e1;
+  --color-info-strong: #2b6cb0;
+  --color-info-bg: #ebf8ff;
+  --color-info-border: #90cdf4;
+
+  --color-purple: #6b46c1;
+  --color-purple-bg: #e9d8fd;
+  --color-purple-border: #d6bcfa;
+
+  --color-orange: #c05621;
+  --color-orange-bg: #fffaf0;
+  --color-orange-border: #fbd38d;
+  --color-orange-chip-bg: #fed7aa;
+  --color-orange-loud-border: #f6ad55;
+
+  /* "A vigilar" (warning temprano) — 5to estado, violeta, distinto de ok/warn/crit/mejora */
+  --color-watch: #9333ea;
+  --color-watch-strong: #7e22ce;
+  --color-watch-bg: #faf5ff;
+  --color-watch-border: #e9d5ff;
+  --color-watch-stripe: rgba(147,51,234,0.16);  /* textura rayada del heatmap (dif. no-color vs mejora) */
+
+  --apdex-excellent: var(--color-ok);
+  --apdex-good: #48bb78;
+  --apdex-fair: var(--color-warning);
+  --apdex-poor: var(--color-critical);
+  --apdex-unacceptable: var(--color-critical-strong);
+
+  --focus-ring: 0 0 0 3px rgba(99,102,241,0.45);
+  --chart-grid: rgba(148,163,184,0.28);
+  --chart-tick: #718096;
+}
+
+[data-theme="dark"] {
+  --bg-page: #0b0f18;
+  --bg-page-sticky: rgba(11,15,24,0.85);
+  --bg-surface: #141b28;
+  --bg-recessed: #1a2231;
+  --bg-zebra: #171e2c;
+  --bg-header-from: #131a29;
+  --bg-header-to: #080b12;
+  --header-glow: rgba(99,102,241,0.34);
+  --header-hairline: rgba(255,255,255,0.1);
+  --header-chip: rgba(255,255,255,0.07);
+  --border: #28323f;
+  --border-strong: #3c4658;
+  --border-subtle: #202834;
+
+  --brand: #818cf8;
+  --brand-strong: #a5b4fc;
+  --brand-bg: rgba(129,140,248,0.12);
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-faint: #64748b;
+  --text-inverse: #f1f5f9;
+  --text-inverse-muted: rgba(241,245,249,0.72);
+
+  --color-critical: #f87171;
+  --color-critical-strong: #fca5a5;
+  --color-critical-bg: #2a1418;
+  --color-critical-border: #6b2b2b;
+  --color-critical-tint-bg: rgba(248,113,113,0.16);
+  --color-critical-tint-border: rgba(248,113,113,0.4);
+
+  --color-warning: #fbbf60;
+  --color-warning-strong: #fcd34d;
+  --color-warning-ink: #fde9c8;
+  --color-warning-bg: #2a2114;
+  --color-warning-border: #6b4f1f;
+  --color-warning-tint-bg: rgba(251,191,96,0.18);
+  --color-warning-tint-border: rgba(251,191,96,0.42);
+
+  --color-ok: #4ade80;
+  --color-ok-strong: #86efac;
+  --color-ok-bg: #10241a;
+  --color-ok-border: #235c3c;
+  --color-ok-tint-bg: rgba(74,222,128,0.16);
+  --color-ok-tint-border: rgba(74,222,128,0.4);
+
+  --color-info: #60a5fa;
+  --color-info-strong: #93c5fd;
+  --color-info-bg: #10203a;
+  --color-info-border: #26456f;
+
+  --color-purple: #c4b5fd;
+  --color-purple-bg: #241a35;
+  --color-purple-border: #4a3268;
+
+  --color-orange: #f0975a;
+  --color-orange-bg: #2a1d10;
+  --color-orange-border: #6b4423;
+  --color-orange-chip-bg: #6b4423;
+  --color-orange-loud-border: #a3652f;
+
+  --color-watch: #c084fc;
+  --color-watch-strong: #d8b4fe;
+  --color-watch-bg: #241633;
+  --color-watch-border: #5b2d87;
+  --color-watch-stripe: rgba(192,132,252,0.22);
+
+  --apdex-good: #6ee7a0;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 6px 16px rgba(0,0,0,0.45);
+  --shadow-lg: 0 20px 44px rgba(0,0,0,0.6);
+
+  --chart-grid: rgba(148,163,184,0.18);
+  --chart-tick: #94a3b8;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { color-scheme: light; }
+html[data-theme="dark"] { color-scheme: dark; }
+body { font-family: var(--font-sans); background: var(--bg-page); color: var(--text-secondary);
+       line-height: 1.5; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+a { color: var(--brand-strong); }
+:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+button:focus-visible, .tab-btn:focus-visible, .info-btn:focus-visible,
+th:focus-visible, .pop-close:focus-visible, .theme-toggle:focus-visible { box-shadow: var(--focus-ring); }
+
+.header { position: relative; overflow: hidden;
+          background:
+            radial-gradient(1100px 320px at 88% -40%, var(--header-glow) 0%, transparent 60%),
+            linear-gradient(135deg, var(--bg-header-from) 0%, var(--bg-header-to) 100%);
+          color: var(--text-inverse); padding: 26px 32px 24px;
+          border-bottom: 1px solid var(--header-hairline); }
+.header-top { display: flex; align-items: flex-start; justify-content: space-between;
+              gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.header-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.kicker { font-size: 0.68rem; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase;
+          color: var(--text-inverse-muted); margin-bottom: 6px; }
+.header h1 { font-size: 1.45rem; font-weight: 750; margin-bottom: 12px; letter-spacing: -0.015em;
+             line-height: 1.2; }
+.header h1 .h1-client { color: #fff; }
+.header h1 .h1-sep { color: var(--text-inverse-muted); font-weight: 400; margin: 0 2px; }
+.header .meta { font-size: 0.8rem; color: var(--text-inverse-muted); display: flex; gap: 8px; flex-wrap: wrap; }
+.header .meta > span { display: inline-flex; align-items: center; gap: 5px;
+                       background: var(--header-chip); border: 1px solid var(--header-hairline);
+                       padding: 3px 10px; border-radius: var(--radius-pill); white-space: nowrap; }
+.header .meta a { color: #cbd5ff; text-decoration: none; }
+.header .meta a:hover, .header .meta a:focus-visible { color: #e5e9ff; text-decoration: underline; }
+.theme-toggle { background: var(--header-chip); color: var(--text-inverse);
+                border: 1px solid var(--header-hairline); border-radius: var(--radius-pill);
+                padding: 6px 14px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+                transition: background 0.15s, border-color 0.15s; white-space: nowrap; }
+.theme-toggle:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
+.status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px;
+                border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.2px; }
+.container { max-width: 1240px; margin: 0 auto; padding: 24px 20px 56px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 24px;
+        overflow-x: auto; position: sticky; top: 0; z-index: 50;
+        background: var(--bg-page-sticky); backdrop-filter: saturate(180%) blur(8px);
+        padding-top: 8px; }
+.tab-btn { padding: 11px 22px; border: none; background: none; cursor: pointer;
+           font-size: 0.9rem; font-weight: 600; color: var(--text-muted);
+           border-bottom: 2.5px solid transparent; margin-bottom: -1px; white-space: nowrap;
+           transition: color 0.15s, border-color 0.15s, background 0.15s;
+           border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.tab-btn:hover { color: var(--text-secondary); background: var(--brand-bg); }
+.tab-btn.active { color: var(--brand-strong); border-bottom-color: var(--brand); }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; animation: fade-in 0.18s ease-out; }
+@keyframes fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* Sections */
+.section { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+           padding: 22px 24px; margin-bottom: 18px; box-shadow: var(--shadow-sm); }
+.section h2 { display: flex; align-items: center; gap: 10px;
+              font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;
+              letter-spacing: 0.6px; margin-bottom: 18px; padding-bottom: 12px;
+              border-bottom: 1px solid var(--border); }
+.section h2::before { content: ""; width: 3px; height: 15px; border-radius: 2px;
+                      background: var(--brand); flex-shrink: 0; }
+/* Secciones colapsables (deep-dive) — mismo look que .section h2 + chevron */
+details.section > summary { list-style: none; cursor: pointer; display: flex; align-items: center;
+  gap: 10px; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.6px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+details.section > summary::-webkit-details-marker { display: none; }
+details.section > summary::before { content: ""; width: 3px; height: 15px; border-radius: 2px;
+  background: var(--brand); flex-shrink: 0; }
+details.section > summary::after { content: "\25B8"; margin-left: auto; color: var(--text-faint);
+  font-size: 0.9rem; transition: transform 0.15s; }
+details.section[open] > summary { margin-bottom: 18px; }
+details.section[open] > summary::after { transform: rotate(90deg); }
+details.section > summary:hover { color: var(--text-secondary); }
+details.section > *:not(summary) { animation: fade-in 0.15s ease-out; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: 14px; }
+.kpi-card { background: var(--bg-recessed); border-radius: var(--radius-md); padding: 16px 16px 15px;
+            border: 1px solid var(--border); text-align: left; position: relative; overflow: hidden;
+            transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s; }
+.kpi-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+                    background: var(--brand); opacity: 0.55; transition: opacity 0.15s; }
+.kpi-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.kpi-card:hover::before { opacity: 1; }
+.info-btn { position: absolute; top: 9px; right: 9px; width: 20px; height: 20px;
+            border-radius: 50%; background: var(--border); color: var(--text-muted);
+            border: none; cursor: pointer; font-size: 0.7rem; font-weight: 700;
+            line-height: 20px; padding: 0; transition: background 0.15s, color 0.15s; }
+.info-btn:hover { background: var(--brand); color: #fff; }
+#kpi-popover { display: none; position: fixed; background: var(--bg-surface);
+               border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 16px 14px;
+               box-shadow: var(--shadow-lg); max-width: 300px;
+               z-index: 9999; }
+.pop-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;
+             color: var(--text-primary); padding-right: 20px; }
+.pop-body { font-size: 0.82rem; line-height: 1.5; color: var(--text-secondary); }
+.pop-verdict { margin-top: 10px; padding: 8px 10px; border-radius: var(--radius-sm);
+               font-size: 0.82rem; line-height: 1.4; }
+.pop-close { position: absolute; top: 8px; right: 10px; background: none;
+             border: none; cursor: pointer; font-size: 1rem; color: var(--text-faint);
+             line-height: 1; padding: 4px; }
+.pop-close:hover { color: var(--text-secondary); }
+.kpi-card .value { font-family: var(--font-mono); font-size: 1.9rem; font-weight: 700;
+                   line-height: 1.1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+                   margin-top: 4px; }
+.kpi-card .label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;
+                   letter-spacing: 0.6px; margin-top: 7px; font-weight: 600; }
+.kpi-card .sub { font-size: 0.76rem; color: var(--text-faint); margin-top: 3px; }
+.conc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.conc-card { border-radius: var(--radius-md); padding: 20px; border: 1px solid var(--border); }
+.conc-card .icon { font-size: 1.6rem; margin-bottom: 8px; }
+.conc-card .type { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
+                   color: var(--text-muted); margin-bottom: 4px; }
+.conc-card h3 { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;
+                line-height: 1.3; }
+.conc-card p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+.bc-card { border-radius: var(--radius-md); padding: 20px; border: 2px solid; margin-bottom: 16px; }
+.bc-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.bc-emoji { font-size: 2rem; }
+.bc-title { font-size: 1.1rem; font-weight: 800; }
+.bc-sublabel { font-size: 0.8rem; opacity: 0.85; }
+.bc-desc { font-size: 0.85rem; line-height: 1.5; }
+.bc-reasoning { font-size: 0.8rem; margin-top: 8px; opacity: 0.75; font-style: italic; }
+.narrative { background: var(--bg-recessed); border-left: 4px solid var(--color-info);
+             padding: 14px 18px; border-radius: 0 var(--radius-md) var(--radius-md) 0;
+             font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary); }
+.info-box { background: var(--color-info-bg); border-left: 4px solid var(--color-info);
+            padding: 12px 16px; border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 0.88rem; line-height: 1.5; color: var(--color-info-strong); margin-bottom: 14px; }
+.warn-box { background: var(--color-warning-bg); border-left: 4px solid var(--color-warning);
+            padding: 12px 16px; border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 0.88rem; line-height: 1.5; color: var(--color-warning-ink); margin-bottom: 14px; }
+.hyp-list { list-style: none; }
+.hyp-item { display: flex; gap: 12px; padding: 12px 0;
+            border-bottom: 1px solid var(--border-subtle); }
+.hyp-item:last-child { border-bottom: none; }
+.priority-badge { display: inline-block; padding: 2px 10px; border-radius: var(--radius-pill);
+                  font-size: 0.7rem; font-weight: 700; white-space: nowrap; }
+.badge-alta { background: var(--color-critical-bg); color: var(--color-critical-strong); border: 1px solid var(--color-critical-border); }
+.badge-media { background: var(--color-warning-bg); color: var(--color-warning-strong); border: 1px solid var(--color-warning-border); }
+.badge-baja { background: var(--color-ok-bg); color: var(--color-ok-strong); border: 1px solid var(--color-ok-border); }
+/* Badge de ESTADO canonico (chip) — un solo vocabulario para todos los estados discretos
+   (semaforo, SLA, TPS, clasificacion, distribucion, SOAP, watch). Distinto de las pills
+   de prioridad/meta (.priority-badge, .status-badge) que son de otra familia a proposito. */
+.badge { display: inline-block; padding: 2px 8px; border-radius: var(--radius-sm);
+         font-size: 0.72rem; font-weight: 700; white-space: nowrap; border: 1px solid transparent; }
+.badge-ok    { background: var(--color-ok-bg);       color: var(--color-ok-strong);       border-color: var(--color-ok-border); }
+.badge-warn  { background: var(--color-warning-bg);  color: var(--color-warning-strong);  border-color: var(--color-warning-border); }
+.badge-crit  { background: var(--color-critical-bg); color: var(--color-critical-strong); border-color: var(--color-critical-border); }
+.badge-info  { background: var(--color-info-bg);     color: var(--color-info-strong);     border-color: var(--color-info-border); }
+.badge-watch { background: var(--color-watch-bg);    color: var(--color-watch-strong);    border-color: var(--color-watch-border); }
+.badge-orange{ background: var(--color-orange-bg);   color: var(--color-orange);          border-color: var(--color-orange-border); }
+.badge-muted { background: var(--bg-recessed);       color: var(--text-muted);            border-color: var(--border); }
+.table-scroll { overflow-x: auto; border-radius: var(--radius-md); }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+th { background: var(--bg-recessed); color: var(--text-muted); font-weight: 700; text-align: left;
+     padding: 10px 12px; border-bottom: 1px solid var(--border-strong); font-size: 0.71rem;
+     text-transform: uppercase; letter-spacing: 0.4px; position: sticky; top: 0; z-index: 1; }
+td { padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+tbody tr:nth-child(even) td { background: var(--bg-zebra); }
+tbody tr:hover td { background: var(--brand-bg); }
+tbody tr:last-child td { border-bottom: none; }
+.level-2 td:first-child { border-left: 4px solid var(--color-critical); }
+.level-1 td:first-child { border-left: 4px solid var(--color-warning); }
+.level-0 td:first-child { border-left: 4px solid var(--color-ok); }
+.level-watch td:first-child { border-left: 4px solid var(--color-watch); }
+.ai-badge { display: inline-block; padding: 3px 12px; border-radius: var(--radius-pill);
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;
+            background: var(--color-purple-bg); color: var(--color-purple); border: 1px solid var(--color-purple-border); }
+.algo-badge { background: var(--bg-recessed); color: var(--text-secondary); border: 1px solid var(--border-strong); }
+.chart-container { position: relative; height: 260px; }
+.timeline-chart { position: relative; height: 200px; }
+.version-chart { position: relative; height: 200px; }
+.timeline-split { display: flex; flex-direction: column; gap: 14px; }
+.timeline-sub-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px; }
+/* Selector de series reusable (buscador + tabs de estado + checklist con punto de color) */
+.picker-layout { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; }
+.picker-chart { flex: 1; min-width: 280px; }
+.series-picker { width: 268px; max-width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md);
+  background: var(--bg-recessed); overflow: hidden; flex-shrink: 0; }
+.sp-toolbar { display: flex; gap: 6px; padding: 10px; border-bottom: 1px solid var(--border); align-items: center; }
+.sp-search { flex: 1; min-width: 0; padding: 6px 10px; font-size: 0.8rem; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-secondary); }
+.sp-search::placeholder { color: var(--text-faint); }
+.sp-actions { display: flex; gap: 4px; }
+.sp-btn { padding: 5px 9px; font-size: 0.7rem; font-weight: 600; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-muted); cursor: pointer; white-space: nowrap; }
+.sp-btn:hover { color: var(--brand-strong); border-color: var(--brand); }
+.sp-tabs { display: flex; gap: 3px; padding: 8px 8px 4px; flex-wrap: wrap; }
+.sp-tab { padding: 4px 10px; font-size: 0.7rem; font-weight: 600; border: none; background: none;
+  color: var(--text-muted); cursor: pointer; border-radius: var(--radius-pill); }
+.sp-tab:hover { background: var(--brand-bg); color: var(--text-secondary); }
+.sp-tab.active { background: var(--brand); color: #fff; }
+.sp-list { max-height: 236px; overflow-y: auto; padding: 6px 8px 10px; }
+.sp-empty { font-size: 0.78rem; color: var(--text-faint); padding: 10px 8px; }
+.sp-row { display: flex; align-items: center; gap: 9px; padding: 6px 8px; border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 0.82rem; color: var(--text-secondary); }
+.sp-row:hover { background: var(--brand-bg); }
+.sp-row input { accent-color: var(--brand); cursor: pointer; margin: 0; flex-shrink: 0; width: 15px; height: 15px; }
+.sp-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(0,0,0,0.06); }
+.sp-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 640px) { .series-picker { width: 100%; } }
+.p1 { color: var(--color-critical-strong); font-weight: 700; }
+.p2 { color: var(--color-warning-strong); font-weight: 700; }
+.p3 { color: var(--color-ok-strong); font-weight: 700; }
+.label-cell { max-width: 320px; word-break: break-word; font-size: 0.82rem; }
+table.sortable th { cursor: pointer; user-select: none; }
+table.sortable th:hover { background: var(--brand-bg); }
+table.sortable th:focus-visible { outline: none; }
+.chart-fallback { padding: 4px 0; }
+.fb-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 0.78rem; }
+.fb-label { width: 160px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis;
+            white-space: nowrap; color: var(--text-secondary); }
+.fb-bar-track { flex: 1; background: var(--border-subtle); border-radius: var(--radius-sm); height: 10px; overflow: hidden; }
+.fb-bar { height: 100%; border-radius: var(--radius-sm); }
+.fb-val { width: 70px; flex-shrink: 0; text-align: right; color: var(--text-muted); font-family: var(--font-mono); }
+.heatmap-scroll { overflow-x: auto; }
+.heatmap-table { border-collapse: separate; border-spacing: 3px; min-width: max-content; }
+.heatmap-table thead th { background: transparent; position: static; border: none;
+  padding: 4px 6px; font-size: 0.66rem; color: var(--text-muted); text-transform: none;
+  letter-spacing: 0; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.heatmap-table thead th:first-child { text-align: left; }
+.heatmap-table tbody td:first-child { background: transparent; text-align: left; padding: 4px 10px 4px 0;
+  font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; border: none; }
+.heatmap-table tbody tr:nth-child(even) td { background: none; }  /* anula el zebra global */
+/* Celda de estado: valor real + color + glyph; textura para "a vigilar" (dif. no-color) */
+.hm-cell { min-width: 56px; height: 42px; text-align: center; vertical-align: middle;
+  border-radius: var(--radius-sm); padding: 2px 5px; position: relative;
+  border: 1px solid transparent; cursor: pointer; }
+.hm-cell:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.hm-cell .hm-v { display: block; font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700;
+  font-variant-numeric: tabular-nums; line-height: 1.1; }
+.hm-cell .hm-d { display: block; font-family: var(--font-mono); font-size: 0.62rem; font-weight: 600;
+  line-height: 1.1; margin-top: 1px; opacity: 0.85; }
+.hm-cell .hm-g { font-family: var(--font-sans); font-size: 0.72rem; font-weight: 700;
+  margin-right: 2px; }
+.hm-ok    { background: var(--color-ok-bg);       color: var(--color-ok-strong);       border-color: var(--color-ok-border); }
+.hm-watch { background: var(--color-watch-bg);    color: var(--color-watch-strong);    border-color: var(--color-watch-border);
+  background-image: repeating-linear-gradient(45deg, transparent 0, transparent 3px,
+    var(--color-watch-stripe) 3px, var(--color-watch-stripe) 6px); }
+.hm-warn  { background: var(--color-warning-bg);  color: var(--color-warning-strong);  border-color: var(--color-warning-border); }
+.hm-crit  { background: var(--color-critical-bg); color: var(--color-critical-strong); border-color: var(--color-critical-border); }
+.hm-impr  { background: var(--color-info-bg);      color: var(--color-info-strong);     border-color: var(--color-info-border); }
+.hm-none  { background: var(--bg-recessed); color: var(--text-faint); border-color: var(--border); }
+/* Leyenda tipo chips arriba de la tabla */
+.hm-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.hm-legend .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem;
+  color: var(--text-secondary); border: 1px solid var(--border); border-radius: var(--radius-pill);
+  padding: 3px 10px 3px 6px; background: var(--bg-recessed); }
+.hm-legend .sw { width: 16px; height: 16px; border-radius: var(--radius-sm); flex-shrink: 0; border: 1px solid transparent;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700;
+  font-family: var(--font-sans); }
+select { background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border); }
+select option { color: var(--text-secondary); }
+@media (max-width: 640px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .conc-grid { grid-template-columns: 1fr; }
+  .header-top { flex-direction: column; }
+}
+.watchlist-item { border-left: 4px solid var(--color-critical); border-radius: 0 var(--radius-md) var(--radius-md) 0;
+                  padding: 14px 18px; margin-bottom: 10px; }
+.watchlist-header { display: flex; justify-content: space-between; align-items: flex-start;
+                    margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+.watchlist-label { font-size: 0.92rem; font-weight: 700; color: var(--text-primary);
+                   word-break: break-word; flex: 1; }
+.watchlist-p95 { font-size: 0.82rem; font-weight: 600; color: var(--text-muted);
+                 white-space: nowrap; padding-top: 2px; font-family: var(--font-mono); }
+.watchlist-reasons { list-style: none; padding-left: 0; margin: 0; }
+.watchlist-reasons li { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 3px;
+                        padding-left: 12px; position: relative; }
+.watchlist-reasons li::before { content: "·"; position: absolute; left: 0; color: var(--text-faint); }
+.verdict-card { border-radius: var(--radius-md); padding: 20px; border: 2px solid; margin-bottom: 4px; }
+.verdict-header { display: flex; align-items: center; gap: 16px; margin-bottom: 10px;
+                  flex-wrap: wrap; }
+.verdict-emoji { font-size: 2.2rem; line-height: 1; }
+.verdict-label { font-size: 1.3rem; font-weight: 800; letter-spacing: 0.5px; }
+.verdict-meta { font-size: 0.82rem; opacity: 0.9; margin-top: 3px; }
+.verdict-desc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="header-badges">
+      <span class="status-badge" style="background:var(--color-ok-tint-bg);color:var(--color-ok);border:1px solid var(--color-ok-tint-border);">
+        🟢 OK
+      </span><span class="status-badge" style="background:var(--color-ok-tint-bg);color:var(--color-ok);border:1px solid var(--color-ok-tint-border);margin-left:8px;">✅ PASS SLA</span>
+    </div>
+    <button id="theme-toggle" class="theme-toggle" type="button" onclick="toggleTheme()">🌙 Oscuro</button>
+  </div>
+  <div class="kicker">Informe de performance · Unitrade</div>
+  <h1><span class="h1-client">DUMMY</span><span class="h1-sep"> / </span>blazedemo<span class="h1-sep"> / </span>load</h1>
+  <div class="meta">
+    <span>🧪 load</span>
+    <span>#️⃣ Run 202607212122</span>
+    <span>🏷️ vbuild-80</span>
+    <span>🕐 2026-07-21 21:22 UTC</span>
+    <span>📊 <a href="https://chbazan.github.io/ut_performance/blazedemo/dummy/load/base/jmeter/" target="_blank">Reporte JMeter</a></span>
+    
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" id="btn-ejecutivo" role="tab" aria-selected="true" aria-controls="pane-ejecutivo" onclick="switchTab('ejecutivo')">📊 Ejecutivo</button>
+    <button class="tab-btn" id="btn-tecnico" role="tab" aria-selected="false" aria-controls="pane-tecnico" onclick="switchTab('tecnico')">🔧 Técnico</button>
+    <button class="tab-btn" id="btn-historial" role="tab" aria-selected="false" aria-controls="pane-historial" onclick="switchTab('historial')">📈 Historial</button>
+  </div>
+
+  <!-- ===== TAB: EJECUTIVO ===== -->
+  <div class="tab-pane active" id="pane-ejecutivo" role="tabpanel" aria-labelledby="btn-ejecutivo">
+
+    <div class="warn-box">
+  <strong>ℹ️ Calidad del dato</strong>
+  <ul style="margin:6px 0 0 16px;padding:0;"><li>Esta es la primera corrida registrada para esta combinación cliente/ambiente/test — todavía no hay baseline histórico. Los valores de esta corrida serán el punto de partida.</li><li>Sin versión anterior registrada para comparar — el veredicto de versión aparecerá cuando haya al menos dos versiones distintas en el historial.</li></ul>
+</div>
+
+    <div class="section">
+      <h2>Estado de la corrida</h2>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <button class="info-btn" onclick="showKpiTip(this,'avg-p95')" aria-haspopup="dialog" aria-expanded="false" aria-label="¿Qué significa este indicador?" title="¿Qué significa esto?">?</button>
+          <div class="value" style="color:var(--color-info);">403</div>
+          <div class="label">avg P95 (ms)</div>
+          <div class="sub">Baseline: 403 ms</div>
+        </div>
+        <div class="kpi-card">
+          <button class="info-btn" onclick="showKpiTip(this,'delta-baseline')" aria-haspopup="dialog" aria-expanded="false" aria-label="¿Qué significa este indicador?" title="¿Qué significa esto?">?</button>
+          <div class="value" style="color:var(--color-ok);">-0.1%</div>
+          <div class="label">Δ vs baseline global</div>
+          <div class="sub">Últimas 50 corridas</div>
+        </div>
+        <div class="kpi-card">
+  <button class="info-btn" onclick="showKpiTip(this,'sample-info')" aria-haspopup="dialog" aria-expanded="false" aria-label="¿Qué significa este indicador?" title="¿Qué significa esto?">?</button>
+  <div class="value" style="color:var(--color-info);">1</div>
+  <div class="label">muestra comparable</div>
+  <div class="sub">primera corrida registrada</div>
+</div>
+        <div class="kpi-card">
+  <button class="info-btn" onclick="showKpiTip(this,'apdex-global')" aria-haspopup="dialog" aria-expanded="false" aria-label="¿Qué significa este indicador?" title="¿Qué significa esto?">?</button>
+  <div class="value" style="color:var(--apdex-excellent);">1.000</div>
+  <div class="label">APDEX global</div>
+  <div class="sub">T=1500 ms · Excellent</div>
+</div>
+        <div class="kpi-card">
+  <button class="info-btn" onclick="showKpiTip(this,'error-rate')" aria-haspopup="dialog" aria-expanded="false" aria-label="¿Qué significa este indicador?" title="¿Qué significa esto?">?</button>
+  <div class="value" style="color:var(--color-ok);">0.00%</div>
+  <div class="label">Error rate global</div>
+  <div class="sub">258 requests</div>
+</div>
+        <div class="kpi-card">
+          <button class="info-btn" onclick="showKpiTip(this,'alerts-count')" aria-haspopup="dialog" aria-expanded="false" aria-label="¿Qué significa este indicador?" title="¿Qué significa esto?">?</button>
+          <div class="value" style="color:var(--color-ok);">
+            0
+          </div>
+          <div class="label">Samplers con alerta</div>
+          <div class="sub">0 rojo · 0 amarillo</div>
+        </div>
+        <div class="kpi-card">
+          <button class="info-btn" onclick="showKpiTip(this,'outliers-count')" aria-haspopup="dialog" aria-expanded="false" aria-label="¿Qué significa este indicador?" title="¿Qué significa esto?">?</button>
+          <div class="value" style="color:var(--color-ok);">0</div>
+          <div class="label">Outliers</div>
+          <div class="sub">&gt; 3× baseline</div>
+        </div>
+        <div class="kpi-card">
+  <button class="info-btn" onclick="showKpiTip(this,'tps-real')" aria-haspopup="dialog" aria-expanded="false" aria-label="¿Qué significa este indicador?" title="¿Qué significa esto?">?</button>
+  <div class="value" style="color:var(--color-ok);">2.83</div>
+  <div class="label">TPS Real</div>
+  <div class="sub">4 servicios OK</div>
+</div>
+        <div class="kpi-card">
+  <button class="info-btn" onclick="showKpiTip(this,'concurrencia')" aria-haspopup="dialog" aria-expanded="false" aria-label="¿Qué significa este indicador?" title="¿Qué significa esto?">?</button>
+  <div class="value" style="color:var(--color-info);">2</div>
+  <div class="label">Concurrencia de usuarios</div>
+  <div class="sub">ctg.threads de esta corrida</div>
+</div>
+        <div class="kpi-card">
+  <button class="info-btn" onclick="showKpiTip(this,'duration')" aria-haspopup="dialog" aria-expanded="false" aria-label="¿Qué significa este indicador?" title="¿Qué significa esto?">?</button>
+  <div class="value" style="font-size:1.5rem;color:var(--text-secondary);">2m 0s</div>
+  <div class="label">Duración del test</div>
+  <div class="sub">Medida por timeline</div>
+</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Clasificación <span class="ai-badge" style="margin-left:8px;">Análisis con Gemini AI</span></h2>
+      <div class="bc-card" style="background:var(--color-ok-bg);border-color:var(--color-ok-border);">
+        <div class="bc-header">
+          <div class="bc-emoji">✅</div>
+          <div>
+            <div class="bc-title" style="color:var(--color-ok-strong);">HEALTHY</div>
+            <div class="bc-sublabel" style="color:var(--color-ok-strong);">Sistema saludable</div>
+          </div>
+        </div>
+        <div class="bc-desc">Todos los samplers operan dentro de sus rangos históricos normales en esta corrida.</div>
+        <div class="bc-reasoning">Sin alertas ni outliers en esta corrida.</div>
+      </div>
+      <div class="narrative">La plataforma Unitrade muestra un rendimiento estable en esta corrida. El P95 promedio fue de 402.6 ms, alineado con el baseline de 403 ms.</div>
+    </div>
+
+    
+
+    
+
+    
+
+    <div class="section">
+      <h2>Conclusiones y recomendaciones</h2>
+      <div class="conc-grid">
+        
+<div class="conc-card" style="background:var(--color-ok-bg);">
+  <div class="icon">✅</div>
+  <div class="type">Escalar prioritario</div>
+  <h3>Sin alertas críticas — avg P95: 402.6 ms</h3>
+  <p>La latencia P95 promedio de la corrida actual es 402.6 ms, muy cercana al baseline de 403 ms.</p>
+</div>
+        
+<div class="conc-card" style="background:var(--color-info-bg);">
+  <div class="icon">🔍</div>
+  <div class="type">Investigar</div>
+  <h3>Rendimiento estable — avg P95: 402.6 ms vs baseline 403 ms</h3>
+  <p>Los samplers más lentos de esta corrida son GET / (P95: 635.75 ms), GET /login (P95: 328.7 ms) y GET /reserve.php (P95: 328.7 ms).</p>
+</div>
+        
+<div class="conc-card" style="background:var(--color-ok-bg);">
+  <div class="icon">⚡</div>
+  <div class="type">Optimizar</div>
+  <h3>Oportunidad de optimización en GET / (Impacto: 636)</h3>
+  <p>El sampler 'GET /' tiene el mayor impacto sistémico con un score de 636 (P95: 635.75 ms, 1 ejecución). Una reducción del 20% en su P95 representaría 127.2 ms de latencia acumulada evitada.</p>
+</div>
+      </div>
+      <h3 style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin:22px 0 12px;">Acciones priorizadas</h3>
+      <table>
+<thead><tr><th>Prioridad</th><th>Acción</th><th>Sampler objetivo</th><th>Evidencia</th></tr></thead>
+<tbody><tr>
+  <td><span class="p3">P3</span></td>
+  <td>Optimizar latencia P95</td>
+  <td class="label-cell" style="color:var(--text-muted);">GET /</td>
+  <td style="color:var(--text-muted);font-size:0.8rem;">Impact_score: 636</td>
+</tr><tr>
+  <td><span class="p3">P3</span></td>
+  <td>Mantener monitoreo proactivo de la estabilidad general</td>
+  <td class="label-cell" style="color:var(--text-muted);">—</td>
+  <td style="color:var(--text-muted);font-size:0.8rem;">Avg P95: 402.6 ms</td>
+</tr><tr>
+  <td><span class="p3">P3</span></td>
+  <td>Revisar y ajustar targets de TPS para reflejar carga real</td>
+  <td class="label-cell" style="color:var(--text-muted);">—</td>
+  <td style="color:var(--text-muted);font-size:0.8rem;">TPS achievement &gt; 1400% en varios servicios</td>
+</tr></tbody>
+</table>
+    </div>
+
+  </div><!-- /pane-ejecutivo -->
+
+
+  <!-- ===== TAB: TÉCNICO ===== -->
+  <div class="tab-pane" id="pane-tecnico" role="tabpanel" aria-labelledby="btn-tecnico">
+
+    <div class="section">
+  <h2>TPS por servicio</h2>
+  <div style="background:var(--color-ok-bg);border-left:3px solid var(--color-ok);padding:12px 16px;margin-bottom:16px;font-size:0.85rem;border-radius:var(--radius-sm);">
+  &#9989; <strong>Calibración de concurrencia (Ley de Little):</strong> con <code>ctg.threads=2</code>
+  configurado, esta corrida cubre la concurrencia mínima estimada (&#8776;0.08, margen 1.3&times;) para sostener el TPS objetivo combinado de los 4
+  servicio(s) con target definido &mdash; fórmula: &Sigma; (TPS objetivo&#8290;&times;&#8290;P95 real seg) &times; margen.
+</div>
+  <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">
+    TPS objetivo extraído del TST configurado en el JMX.
+    Cumplimiento &lt; 80% indica carga insuficiente &mdash; revisar concurrencia CTG o infraestructura.
+    Cumplimiento &gt;= 150% se marca <strong>Escalable</strong>: el servicio sostuvo bastante más TPS
+    que su objetivo actual bajo la misma concurrencia — candidato a subirle el objetivo. Válido sólo
+    comparando corridas con la misma concurrencia (`ctg.threads`) y el mismo conjunto de servicios; un
+    cumplimiento bajo en una corrida futura con TPS objetivo más alto puede ser falta de calibración de
+    concurrencia, no una regresión de performance (ver aviso de concurrencia arriba si aparece).
+  </p>
+  <table class="sortable">
+    <thead><tr>
+      <th>Servicio</th><th>Objetivo</th>
+      <th title="Calculado sobre la duración total del test para comparar de forma uniforme contra el objetivo; puede diferir 3-6% del throughput que muestra JMeter para ese label en particular, que usa su propia ventana de muestras (primer a último request de ESE label, no de todo el test).">Real ⓘ</th>
+      <th title="Cantidad de requests de este servicio durante la corrida — de ahí sale el TPS real (muestras ÷ duración).">Muestras ⓘ</th>
+      <th>Cumplimiento</th><th>Estado</th>
+    </tr></thead>
+    <tbody><tr>
+  <td class="label-cell">GET /</td>
+  <td>0.05/s</td>
+  <td>0.724/s</td>
+  <td>66</td>
+  <td>1448%</td>
+  <td><span class="badge badge-info">&#128640; Escalable</span></td>
+</tr><tr>
+  <td class="label-cell">GET /login</td>
+  <td>0.03/s</td>
+  <td>0.702/s</td>
+  <td>64</td>
+  <td>2340%</td>
+  <td><span class="badge badge-info">&#128640; Escalable</span></td>
+</tr><tr>
+  <td class="label-cell">GET /reserve.php</td>
+  <td>0.03/s</td>
+  <td>0.702/s</td>
+  <td>64</td>
+  <td>2340%</td>
+  <td><span class="badge badge-info">&#128640; Escalable</span></td>
+</tr><tr>
+  <td class="label-cell">GET /vacation.html</td>
+  <td>0.02/s</td>
+  <td>0.702/s</td>
+  <td>64</td>
+  <td>3510%</td>
+  <td><span class="badge badge-info">&#128640; Escalable</span></td>
+</tr></tbody>
+  </table>
+</div>
+
+    
+
+    <div class="section">
+  <h2>SLA Compliance</h2>
+  <table class="sortable">
+    <thead><tr>
+      <th>Sampler</th><th>P50</th>
+      <th>P95 Real</th><th>Threshold P95</th>
+      <th>P99 Real</th><th>Threshold P99</th>
+      <th>Error %</th><th>Threshold ER</th>
+      <th>Estado</th>
+    </tr></thead>
+    <tbody><tr>
+  <td class="label-cell">GET /</td>
+  <td>474 ms</td>
+  <td>636 ms</td><td style='color:var(--color-ok);font-weight:600'>3000 ms</td>
+  <td>901 ms</td><td style='color:var(--color-ok);font-weight:600'>6000 ms</td>
+  <td>0.00%</td><td style='color:var(--color-ok);font-weight:600'>5.0%</td>
+  <td><span class="badge badge-ok">✅ PASS</span></td>
+</tr><tr>
+  <td class="label-cell">GET /login</td>
+  <td>302 ms</td>
+  <td>329 ms</td><td style='color:var(--color-ok);font-weight:600'>3000 ms</td>
+  <td>352 ms</td><td style='color:var(--color-ok);font-weight:600'>6000 ms</td>
+  <td>0.00%</td><td style='color:var(--color-ok);font-weight:600'>5.0%</td>
+  <td><span class="badge badge-ok">✅ PASS</span></td>
+</tr><tr>
+  <td class="label-cell">GET /reserve.php</td>
+  <td>300 ms</td>
+  <td>329 ms</td><td style='color:var(--color-ok);font-weight:600'>3000 ms</td>
+  <td>371 ms</td><td style='color:var(--color-ok);font-weight:600'>6000 ms</td>
+  <td>0.00%</td><td style='color:var(--color-ok);font-weight:600'>5.0%</td>
+  <td><span class="badge badge-ok">✅ PASS</span></td>
+</tr><tr>
+  <td class="label-cell">GET /vacation.html</td>
+  <td>284 ms</td>
+  <td>317 ms</td><td style='color:var(--color-ok);font-weight:600'>3000 ms</td>
+  <td>322 ms</td><td style='color:var(--color-ok);font-weight:600'>6000 ms</td>
+  <td>0.00%</td><td style='color:var(--color-ok);font-weight:600'>5.0%</td>
+  <td><span class="badge badge-ok">✅ PASS</span></td>
+</tr>
+      <tr class="sort-pin" style="background:var(--color-ok-bg);">
+        <td colspan="8" style="text-align:right;font-weight:700;color:var(--text-secondary);">Veredicto global</td>
+        <td style="color:var(--color-ok);font-weight:700;font-size:1rem">✅ PASS</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+    <div class="section">
+      <h2>Semáforo de samplers</h2>
+      <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">
+        Sólo se listan samplers con alerta activa (rojo/amarillo), <strong>a vigilar</strong> (warning
+        temprano: regresión leve sostenida ≥2 corridas) o mejora significativa — no es la lista completa
+        de samplers de esta corrida. El resto operó dentro de su rango histórico normal y no aparece acá
+        (ver "Top 10 samplers más lentos" o el heatmap en Historial para el detalle completo).
+      </p>
+      <p style='color:var(--text-muted);font-size:0.85rem;'>Sin alertas, avisos ni mejoras en esta corrida.</p>
+    </div>
+
+    <div class="section">
+  <h2>Timeline de la corrida (ventanas de 30s)</h2>
+  <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">
+    Agregado de todos los samplers combinados — cubre la corrida completa, del primer al último request.
+    Dos gráficos con el <strong>mismo eje X</strong> (segundos) y tooltip sincronizado: latencia arriba,
+    throughput y errores abajo. Para ver la curva de un sampler puntual en vez de la mezcla, usar
+    "Timeline por servicio" más abajo.
+  </p>
+  <div class="timeline-split">
+    <div class="timeline-sub">
+      <div class="timeline-sub-label">Latencia (ms)</div>
+      <div class="timeline-chart"><canvas id="timelineLatChart"></canvas></div>
+    </div>
+    <div class="timeline-sub">
+      <div class="timeline-sub-label">Throughput y errores</div>
+      <div class="timeline-chart" style="height:150px;"><canvas id="timelineTpsChart"></canvas></div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding:10px 14px;background:var(--bg-recessed);
+  border-left:3px solid var(--color-warning);border-radius:var(--radius-sm);font-size:0.85rem;">
+  <strong style="color:var(--color-warning);">⚡ Spike puntual</strong><br>
+  <span style="color:var(--text-secondary);">Pico de 600 ms en la ventana de 30s. La latencia se recuperó. Impulsado principalmente por <strong>GET /</strong> (P95 643 ms en esa ventana, vs 323 ms del resto de samplers). Investigar ese sampler puntualmente en esa ventana.</span>
+</div>
+</div>
+
+    <div class="section">
+  <h2>Timeline por servicio</h2>
+  <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">
+    El gráfico de arriba mezcla todos los samplers en un único P95 por ventana. Acá buscás y tildás
+    samplers puntuales para ver su propia curva P95 dentro de esta misma corrida — útil para confirmar
+    cuál sampler explica un pico o una tendencia del gráfico agregado.
+  </p>
+  <div class="picker-layout">
+    <div class="series-picker" id="sp-timeline-service">
+  <div class="sp-toolbar">
+    <input type="search" class="sp-search" placeholder="Buscar servicio..." aria-label="Buscar servicio">
+    <div class="sp-actions">
+      <button type="button" class="sp-btn sp-all">Todas</button>
+      <button type="button" class="sp-btn sp-none">Limpiar</button>
+    </div>
+  </div>
+  <div class="sp-tabs" role="group" aria-label="Filtrar por estado">
+    <button type="button" class="sp-tab active" data-f="all" aria-pressed="true">Todos</button>
+    <button type="button" class="sp-tab" data-f="alert" aria-pressed="false">Con alerta</button>
+    <button type="button" class="sp-tab" data-f="outlier" aria-pressed="false">Outliers</button>
+    <button type="button" class="sp-tab" data-f="ok" aria-pressed="false">OK</button>
+  </div>
+  <div class="sp-list"><label class="sp-row" data-label="GET /" data-status="ok"><input type="checkbox" value="GET /" checked><span class="sp-dot" style="background:#3b7dd8;"></span><span class="sp-name">GET /</span></label><label class="sp-row" data-label="GET /login" data-status="ok"><input type="checkbox" value="GET /login" checked><span class="sp-dot" style="background:#e8563f;"></span><span class="sp-name">GET /login</span></label><label class="sp-row" data-label="GET /reserve.php" data-status="ok"><input type="checkbox" value="GET /reserve.php" checked><span class="sp-dot" style="background:#0ea371;"></span><span class="sp-name">GET /reserve.php</span></label><label class="sp-row" data-label="GET /vacation.html" data-status="ok"><input type="checkbox" value="GET /vacation.html"><span class="sp-dot" style="background:#a25bd6;"></span><span class="sp-name">GET /vacation.html</span></label><div class="sp-empty" style="display:none;">Sin coincidencias.</div></div>
+</div>
+    <div class="picker-chart">
+      <div class="chart-container">
+        <canvas id="timelineServiceChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="section">
+      <h2>Outliers de esta corrida</h2>
+      <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">
+        Samplers cuyo P95 en esta corrida superó <strong>3&times;</strong> su baseline histórico — picos
+        extremos, no la misma señal que el semáforo (que dispara con umbrales mucho menores). Ver
+        "Outliers reincidentes" en Historial si el mismo sampler aparece acá en corridas consecutivas.
+      </p>
+      <p style='color:var(--text-muted);font-size:0.85rem;'>Sin outliers en esta corrida.</p>
+    </div>
+
+    <div class="section">
+      <h2>Top 10 samplers más lentos</h2>
+      <table class="sortable">
+<thead><tr><th>#</th><th>Sampler</th><th>P50</th><th>P95</th><th>P99</th><th>Payload P95</th></tr></thead>
+<tbody><tr>
+  <td>1</td>
+  <td class="label-cell">GET /</td>
+  <td>474 ms</td>
+  <td>636 ms</td>
+  <td>901 ms</td>
+  <td>4.7 KB</td>
+</tr><tr>
+  <td>2</td>
+  <td class="label-cell">GET /login</td>
+  <td>302 ms</td>
+  <td>329 ms</td>
+  <td>352 ms</td>
+  <td>5.6 KB</td>
+</tr><tr>
+  <td>3</td>
+  <td class="label-cell">GET /reserve.php</td>
+  <td>300 ms</td>
+  <td>329 ms</td>
+  <td>371 ms</td>
+  <td>7.1 KB</td>
+</tr><tr>
+  <td>4</td>
+  <td class="label-cell">GET /vacation.html</td>
+  <td>284 ms</td>
+  <td>317 ms</td>
+  <td>322 ms</td>
+  <td>3.3 KB</td>
+</tr></tbody>
+</table>
+    </div>
+
+    
+
+    <details class="section collapsible">
+  <summary>APDEX por sampler</summary>
+  <div class="info-box">
+    <strong>T = 1500 ms</strong> — tiempo de respuesta considerado aceptable para el usuario.
+    Satisfied ≤ T &nbsp;|&nbsp; Tolerating ≤ 4T (6000 ms) &nbsp;|&nbsp; Frustrated &gt; 4T.
+    Score: Excellent ≥ 0.94 · Good ≥ 0.85 · Fair ≥ 0.70 · Poor ≥ 0.50 · Unacceptable &lt; 0.50.
+  </div>
+  <table class="sortable">
+    <thead><tr><th>Sampler</th><th>P95</th><th>APDEX</th><th>Rating</th></tr></thead>
+    <tbody><tr>
+  <td class="label-cell">GET /</td>
+  <td>636 ms</td>
+  <td style="color:var(--apdex-excellent);font-weight:700">1.000</td>
+  <td style="color:var(--apdex-excellent)">Excellent</td>
+</tr><tr>
+  <td class="label-cell">GET /login</td>
+  <td>329 ms</td>
+  <td style="color:var(--apdex-excellent);font-weight:700">1.000</td>
+  <td style="color:var(--apdex-excellent)">Excellent</td>
+</tr><tr>
+  <td class="label-cell">GET /reserve.php</td>
+  <td>329 ms</td>
+  <td style="color:var(--apdex-excellent);font-weight:700">1.000</td>
+  <td style="color:var(--apdex-excellent)">Excellent</td>
+</tr><tr>
+  <td class="label-cell">GET /vacation.html</td>
+  <td>317 ms</td>
+  <td style="color:var(--apdex-excellent);font-weight:700">1.000</td>
+  <td style="color:var(--apdex-excellent)">Excellent</td>
+</tr>
+      <tr class="sort-pin" style="background:var(--bg-recessed);font-weight:700">
+        <td colspan="2" style="text-align:right;color:var(--text-secondary);">APDEX global (ponderado por requests)</td>
+        <td style="color:var(--apdex-excellent)">1.000</td>
+        <td style="color:var(--apdex-excellent)">Excellent</td>
+      </tr>
+    </tbody>
+  </table>
+</details>
+
+    <details class="section collapsible">
+  <summary>Eficiencia de payload</summary>
+  <div class="info-box">ℹ️ La lentitud no viene del tamaño de las respuestas (avg 5.16 KB). Los endpoints más lentos no son lentos por el volumen de datos que devuelven — la demora está en el procesamiento del servidor (cálculos, consultas, etc.), no en la cantidad de información transferida.</div>
+  <table class="sortable">
+    <thead><tr>
+      <th>Sampler</th><th>P95</th><th>Payload P95</th>
+      <th title="KB transferidos por segundo de latencia — no es throughput de red">KB/s de latencia ⓘ</th>
+      <th title="Diagnóstico basado en el tamaño de respuesta vs la latencia observada">Diagnóstico ⓘ</th>
+    </tr></thead>
+    <tbody><tr>
+  <td class="label-cell">GET /</td>
+  <td>636 ms</td>
+  <td>4.65 KB</td>
+  <td style="color:var(--text-muted);font-size:0.8rem;">7.31 KB/s</td>
+  <td style="font-size:0.78rem;color:var(--color-orange);">Cuello en procesamiento — respuesta pequeña pero lenta → overhead en servidor</td>
+</tr><tr>
+  <td class="label-cell">GET /login</td>
+  <td>329 ms</td>
+  <td>5.62 KB</td>
+  <td style="color:var(--text-muted);font-size:0.8rem;">17.10 KB/s</td>
+  <td style="font-size:0.78rem;color:var(--text-muted);">Respuesta pequeña — dentro de lo esperado</td>
+</tr><tr>
+  <td class="label-cell">GET /reserve.php</td>
+  <td>329 ms</td>
+  <td>7.08 KB</td>
+  <td style="color:var(--text-muted);font-size:0.8rem;">21.54 KB/s</td>
+  <td style="font-size:0.78rem;color:var(--text-muted);">Respuesta pequeña — dentro de lo esperado</td>
+</tr><tr>
+  <td class="label-cell">GET /vacation.html</td>
+  <td>317 ms</td>
+  <td>3.27 KB</td>
+  <td style="color:var(--text-muted);font-size:0.8rem;">10.31 KB/s</td>
+  <td style="font-size:0.78rem;color:var(--text-muted);">Respuesta pequeña — dentro de lo esperado</td>
+</tr></tbody>
+  </table>
+</details>
+
+    
+
+    <details class="section collapsible">
+  <summary>Distribución P50 / P95 / P99</summary>
+  <div class="info-box">
+    Compara los tiempos de respuesta <strong>dentro de esta misma corrida</strong> — cómo se reparten
+    los requests individuales, del más rápido al más lento, en esta única ejecución.<br><br>
+    <strong>Ejemplo:</strong> un servicio con P50 = 200 ms y P95 = 1000 ms (ratio P95/P50 = 5&times;)
+    significa que la mitad de los requests respondió en 200 ms o menos, pero el 5% más lento tardó
+    5 veces más. Si además su P99 = 1200 ms (ratio P99/P95 = 1.2&times;, cercano a 1), esos casos
+    extremos no se alejan mucho del P95 — se clasifica NORMAL o UNIFORME. Si en cambio el P99 fuera
+    4000 ms (4&times; el P95), habría una <strong>cola larga</strong>: un puñado de requests bastante
+    peores que el resto, todos dentro de esta misma corrida.<br><br>
+    <strong>Los dos ratios de la tabla:</strong><br>
+    • <strong>P95/P50</strong> — dispersión general: compara el usuario típico (P50) con el percentil 95.<br>
+    • <strong>P99/P95</strong> — longitud de la cola extrema: si es alto (&gt;2×), hay picos esporádicos
+      que el P95 no captura. Si es cercano a 1×, los peores casos están bien acotados.
+  </div>
+  <table class="sortable">
+    <thead><tr>
+      <th>Sampler</th>
+      <th title="50% de los requests respondió en este tiempo o menos. Representa al usuario típico." style="text-align:right">P50 ⓘ</th>
+      <th title="95% de los requests respondió en este tiempo o menos. Estándar de performance." style="text-align:right">P95 ⓘ</th>
+      <th title="99% de los requests respondió en este tiempo o menos. Captura los peores casos." style="text-align:right">P99 ⓘ</th>
+      <th title="P95 ÷ P50 — qué tan amplia es la distribución. &gt;4× indica alta variabilidad." style="text-align:right">P95/P50 ⓘ</th>
+      <th title="P99 ÷ P95 — longitud de la cola extrema. &gt;2× sugiere picos esporádicos significativos." style="text-align:right">P99/P95 ⓘ</th>
+      <th>Tipo</th>
+      <th>Interpretación</th>
+    </tr></thead>
+    <tbody><tr>
+  <td class="label-cell">GET /</td>
+  <td style="text-align:right">474 ms</td>
+  <td style="text-align:right">636 ms</td>
+  <td style="text-align:right">901 ms</td>
+  <td style="text-align:right;color:var(--text-muted)">1.3×</td>
+  <td style="text-align:right;color:var(--text-muted)">1.4×</td>
+  <td><span class="badge badge-info">NORMAL</span></td>
+  <td style="font-size:0.78rem;color:var(--text-secondary)">Variabilidad dentro de rangos esperados: P50 474 → P95 636 → P99 901 ms. No se detectan picos extremos ni bimodalidad.</td>
+</tr><tr>
+  <td class="label-cell">GET /login</td>
+  <td style="text-align:right">302 ms</td>
+  <td style="text-align:right">329 ms</td>
+  <td style="text-align:right">352 ms</td>
+  <td style="text-align:right;color:var(--text-muted)">1.1×</td>
+  <td style="text-align:right;color:var(--text-muted)">1.1×</td>
+  <td><span class="badge badge-ok">UNIFORME</span></td>
+  <td style="font-size:0.78rem;color:var(--text-secondary)">P50 (302 ms), P95 (329 ms) y P99 (352 ms) están concentrados. El sistema responde de forma predecible — todos los usuarios tienen experiencias similares.</td>
+</tr><tr>
+  <td class="label-cell">GET /reserve.php</td>
+  <td style="text-align:right">300 ms</td>
+  <td style="text-align:right">329 ms</td>
+  <td style="text-align:right">371 ms</td>
+  <td style="text-align:right;color:var(--text-muted)">1.1×</td>
+  <td style="text-align:right;color:var(--text-muted)">1.1×</td>
+  <td><span class="badge badge-ok">UNIFORME</span></td>
+  <td style="font-size:0.78rem;color:var(--text-secondary)">P50 (300 ms), P95 (329 ms) y P99 (371 ms) están concentrados. El sistema responde de forma predecible — todos los usuarios tienen experiencias similares.</td>
+</tr><tr>
+  <td class="label-cell">GET /vacation.html</td>
+  <td style="text-align:right">284 ms</td>
+  <td style="text-align:right">317 ms</td>
+  <td style="text-align:right">322 ms</td>
+  <td style="text-align:right;color:var(--text-muted)">1.1×</td>
+  <td style="text-align:right;color:var(--text-muted)">1.0×</td>
+  <td><span class="badge badge-ok">UNIFORME</span></td>
+  <td style="font-size:0.78rem;color:var(--text-secondary)">P50 (284 ms), P95 (317 ms) y P99 (322 ms) están concentrados. El sistema responde de forma predecible — todos los usuarios tienen experiencias similares.</td>
+</tr></tbody>
+  </table>
+</details>
+
+    <details class="section collapsible">
+  <summary>Hipótesis de causa raíz</summary>
+  <ul class="hyp-list"><li class="hyp-item">
+  <div style="flex-shrink:0;padding-top:2px;">
+    <span class="priority-badge badge-baja">BAJA</span>
+  </div>
+  <div>
+    <strong style="font-size:0.9rem;">Variabilidad dentro de parámetros normales.</strong>
+    <p style="font-size:0.82rem;color:var(--text-muted);margin-top:3px;">Sin alertas ni outliers en esta corrida.</p>
+  </div>
+</li><li class="hyp-item">
+  <div style="flex-shrink:0;padding-top:2px;">
+    <span class="priority-badge badge-baja">BAJA</span>
+  </div>
+  <div>
+    <strong style="font-size:0.9rem;">Potencial de latencia en servicios de alto impacto.</strong>
+    <p style="font-size:0.82rem;color:var(--text-muted);margin-top:3px;">GET / con P95 de 635.75 ms y alto impact_score.</p>
+  </div>
+</li><li class="hyp-item">
+  <div style="flex-shrink:0;padding-top:2px;">
+    <span class="priority-badge badge-baja">BAJA</span>
+  </div>
+  <div>
+    <strong style="font-size:0.9rem;">Posible desajuste en targets de TPS.</strong>
+    <p style="font-size:0.82rem;color:var(--text-muted);margin-top:3px;">GET / con tps_achievement_pct de 1448.0%.</p>
+  </div>
+</li></ul>
+</details>
+
+  </div><!-- /pane-tecnico -->
+
+
+  <!-- ===== TAB: HISTORIAL ===== -->
+  <div class="tab-pane" id="pane-historial" role="tabpanel" aria-labelledby="btn-historial">
+
+    
+
+    <details class="section collapsible">
+  <summary>Tendencia P95 por versión</summary>
+  <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">
+    avg P95 promedio de todas las corridas registradas por versión.
+  </p>
+  <div class="version-chart">
+    <canvas id="versionTrendChart"></canvas>
+  </div>
+</details>
+
+    
+
+    <div class="section">
+      <h2>Tendencia avg P95 — últimas 1 corridas</h2>
+      <div class="chart-container">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+
+    <div class="section">
+  <h2>Heatmap — estado por sampler y corrida (últimas 1)</h2>
+  <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">
+    Cada celda muestra el <strong>P95 real (ms)</strong> de esa corrida, coloreado por su estado
+    <strong>relativo a su propio baseline</strong> (no una escala absoluta). "A vigilar" va rayado
+    para distinguirlo de "Mejora" sin depender del color. Hacé clic o tocá una celda (o Enter con
+    el foco puesto) para ver P95, Δ vs baseline y la nota de enmascarado si aplica.
+  </p>
+  <div class="hm-legend"><span class="chip"><span class="sw hm-ok">·</span>OK</span><span class="chip"><span class="sw hm-watch">◆</span>A vigilar</span><span class="chip"><span class="sw hm-warn">▲</span>Advertencia</span><span class="chip"><span class="sw hm-crit">✖</span>Crítico</span><span class="chip"><span class="sw hm-impr">▼</span>Mejora</span><span class="chip"><span class="sw hm-none"></span>Sin datos</span></div>
+  <div class="heatmap-scroll">
+  <table class="heatmap-table">
+    <thead><tr><th>Sampler</th><th>2026-07-21</th></tr></thead>
+    <tbody><tr><td>GET /</td><td class="hm-cell hm-ok" tabindex="0" aria-label="OK. 2026-07-21. P95: 636 ms · Δ 0.0% vs baseline global" aria-haspopup="dialog" aria-expanded="false" data-run="2026-07-21" data-detail="P95: 636 ms · Δ 0.0% vs baseline global" onclick="showCellDetail(this)"><span class="hm-v"><span class="hm-g" aria-hidden="true">·</span>636</span></td></tr><tr><td>GET /login</td><td class="hm-cell hm-ok" tabindex="0" aria-label="OK. 2026-07-21. P95: 329 ms · Δ 0.0% vs baseline global" aria-haspopup="dialog" aria-expanded="false" data-run="2026-07-21" data-detail="P95: 329 ms · Δ 0.0% vs baseline global" onclick="showCellDetail(this)"><span class="hm-v"><span class="hm-g" aria-hidden="true">·</span>329</span></td></tr><tr><td>GET /reserve.php</td><td class="hm-cell hm-ok" tabindex="0" aria-label="OK. 2026-07-21. P95: 329 ms · Δ 0.0% vs baseline global" aria-haspopup="dialog" aria-expanded="false" data-run="2026-07-21" data-detail="P95: 329 ms · Δ 0.0% vs baseline global" onclick="showCellDetail(this)"><span class="hm-v"><span class="hm-g" aria-hidden="true">·</span>329</span></td></tr><tr><td>GET /vacation.html</td><td class="hm-cell hm-ok" tabindex="0" aria-label="OK. 2026-07-21. P95: 317 ms · Δ 0.0% vs baseline global" aria-haspopup="dialog" aria-expanded="false" data-run="2026-07-21" data-detail="P95: 317 ms · Δ 0.0% vs baseline global" onclick="showCellDetail(this)"><span class="hm-v"><span class="hm-g" aria-hidden="true">·</span>317</span></td></tr></tbody>
+  </table>
+  </div>
+</div>
+
+    
+
+    
+
+  </div><!-- /pane-historial -->
+
+</div><!-- /container -->
+
+<div id="kpi-popover" role="dialog" aria-modal="false"></div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Tema claro/oscuro — toggle manual persistido en localStorage. El atributo
+// data-theme ya fue seteado en <head> (antes del primer paint) para evitar
+// flash de tema incorrecto; acá sólo sincronizamos el label del botón y
+// manejamos el click.
+// ---------------------------------------------------------------------------
+function _themeButtonLabel(theme) {
+  return theme === 'dark' ? '☀️ Claro' : '🌙 Oscuro';
+}
+(function() {
+  var btn = document.getElementById('theme-toggle');
+  if (btn) btn.textContent = _themeButtonLabel(document.documentElement.getAttribute('data-theme'));
+})();
+
+function toggleTheme() {
+  var root = document.documentElement;
+  var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem('ut-theme', next); } catch (e) {}
+  var btn = document.getElementById('theme-toggle');
+  if (btn) btn.textContent = _themeButtonLabel(next);
+  if (typeof _reThemeCharts === 'function') _reThemeCharts();
+}
+
+// ---------------------------------------------------------------------------
+// KPI popover — tooltips contextuales en los cards del Ejecutivo
+// ---------------------------------------------------------------------------
+var _kpiTips = {"avg-p95": "<div class=\"pop-title\">P95 (Percentil 95)</div><div class=\"pop-body\"><strong>P95</strong> = tiempo de respuesta por debajo del cual se encuentran el 95% de las solicitudes. Es el indicador estándar de performance: ignora el 5% de picos extremos y refleja la experiencia real de la mayoría de los usuarios.</div><div class=\"pop-verdict\" style=\"background:var(--color-ok-bg);border-left:3px solid var(--color-ok);\">✅ Dentro del rango normal: 403 ms vs historial 403 ms.</div>", "delta-baseline": "<div class=\"pop-title\">Δ vs Baseline Global</div><div class=\"pop-body\">Compara el P95 de esta corrida contra el <strong>baseline global</strong> (promedio de las últimas 50 corridas). <strong>Positivo = más lento</strong> (peor) que el historial. <strong>Negativo = más rápido</strong> (mejor).</div><div class=\"pop-verdict\" style=\"background:var(--color-ok-bg);border-left:3px solid var(--color-ok);\">✅ 0% más rápido que el historial.</div>", "sample-info": "<div class=\"pop-title\">Muestras comparables</div><div class=\"pop-body\">Cantidad de corridas históricas (incluida esta) que testearon <strong>exactamente los mismos servicios</strong> que esta corrida. Comparar avg P95 o tendencias entre corridas con distinta composición de servicios no es válido — no es la misma prueba repetida, es otra prueba distinta.</div><div class=\"pop-verdict\" style=\"background:var(--color-info-bg);border-left:3px solid var(--color-info);\">ℹ️ Primera corrida registrada para esta combinación cliente/ambiente/test — todavía no hay con qué comparar la composición de servicios.</div>", "apdex-global": "<div class=\"pop-title\">APDEX (Application Performance Index)</div><div class=\"pop-body\"><strong>APDEX</strong> mide qué porcentaje de usuarios tuvo una experiencia satisfactoria. T = 1500 ms (tiempo máximo aceptable).<br>✅ Excellent ≥ 0.94 · Good ≥ 0.85 · Fair ≥ 0.70 · Poor ≥ 0.50 · ❌ Unacceptable &lt; 0.50</div><div class=\"pop-verdict\" style=\"background:var(--color-ok-bg);border-left:3px solid var(--color-ok);\">✅ Excellent (1.000) — más del 94% de los usuarios tuvo tiempos de respuesta aceptables.</div>", "error-rate": "<div class=\"pop-title\">Error Rate Global</div><div class=\"pop-body\">Porcentaje de requests que fallaron (error HTTP, timeout, o error funcional). SLA estándar: <strong>&lt; 1%</strong>. En servicios SOAP, un HTTP 200 puede ocultar un error funcional (CodigoError ≠ 0).</div><div class=\"pop-verdict\" style=\"background:var(--color-ok-bg);border-left:3px solid var(--color-ok);\">✅ Sin errores en 258 requests — todas las requests completaron exitosamente.</div>", "alerts-count": "<div class=\"pop-title\">Samplers con Alerta</div><div class=\"pop-body\">Cantidad de samplers (endpoints) cuyo P95 superó umbrales de alerta según el historial. <strong>Rojo</strong>: degradación persistente (más de una corrida consecutiva). <strong>Amarillo</strong>: degradación detectada solo en esta corrida.</div><div class=\"pop-verdict\" style=\"background:var(--color-ok-bg);border-left:3px solid var(--color-ok);\">✅ Sin alertas — todos los endpoints respondieron dentro de sus rangos históricos normales.</div>", "outliers-count": "<div class=\"pop-title\">Outliers (Picos Extremos)</div><div class=\"pop-body\">Samplers con un P95 <strong>más de 3 veces mayor</strong> que su baseline histórico. Son picos extremos que indican comportamiento anómalo, no solo lentitud leve.</div><div class=\"pop-verdict\" style=\"background:var(--color-ok-bg);border-left:3px solid var(--color-ok);\">✅ Sin outliers — no hubo picos extremos. Comportamiento estable y predecible en toda la corrida.</div>", "tps-real": "<div class=\"pop-title\">TPS (Transacciones por Segundo)</div><div class=\"pop-body\"><strong>TPS</strong> (Transactions Per Second) = requests procesadas por segundo. Mide la capacidad de throughput real del sistema bajo la carga del test. El objetivo se define por servicio en el TST del JMX, no como un único valor agregado — ver el detalle en la tabla \"TPS por servicio\" de la pestaña Técnico.</div><div class=\"pop-verdict\" style=\"background:var(--color-ok-bg);border-left:3px solid var(--color-ok);\">✅ TPS real: 2.83/s. Los 4 servicio(s) con objetivo definido lo cumplieron (&gt;= 90%).</div>", "duration": "<div class=\"pop-title\">Duración del Test</div><div class=\"pop-body\">Duración total medida desde el primer hasta el último request del JTL. Es la duración real del test, no el tiempo total del pipeline de CI/CD.</div><div class=\"pop-verdict\" style=\"background:var(--color-info-bg);border-left:3px solid var(--color-info);\">ℹ️ El test procesó requests durante 2m 0s. Útil para calcular TPS y detectar fases de ramp-up/ramp-down.</div>", "concurrencia": "<div class=\"pop-title\">Concurrencia de Usuarios</div><div class=\"pop-body\">Cantidad de hilos concurrentes del Concurrency Thread Group (<strong>ctg.threads</strong>) configurada para esta corrida en <code>config/clients/*.properties</code>. Relaciona el TPS real obtenido con la carga concurrente que lo generó (Ley de Little).</div><div class=\"pop-verdict\" style=\"background:var(--color-info-bg);border-left:3px solid var(--color-info);\">ℹ️ Esta corrida se ejecutó con 2 usuario(s) concurrente(s) en el CTG.</div>"};
+var _popover = document.getElementById('kpi-popover');
+var _activeBtn = null;
+
+// Marca el disparador activo y sincroniza aria-expanded (el anterior vuelve a false).
+function _setActiveTrigger(el) {
+  if (_activeBtn && _activeBtn !== el) _activeBtn.setAttribute('aria-expanded', 'false');
+  _activeBtn = el;
+  if (el) el.setAttribute('aria-expanded', 'true');
+}
+
+function showKpiTip(btn, tipId) {
+  if (_activeBtn === btn && _popover.style.display !== 'none') {
+    hidePopover(true); return;
+  }
+  var tip = _kpiTips[tipId];
+  if (!tip) return;
+  _popover.innerHTML = tip + '<button type="button" class="pop-close" aria-label="Cerrar">✕</button>';
+  _popover.style.display = 'block';
+  var r = btn.getBoundingClientRect();
+  var pw = _popover.offsetWidth || 300;
+  var ph = _popover.offsetHeight || 160;
+  var left = r.right - pw;
+  if (left < 8) left = 8;
+  if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+  var top = r.bottom + 8;
+  if (top + ph > window.innerHeight - 8) top = r.top - ph - 8;
+  if (top < 8) top = 8;
+  _popover.style.left = left + 'px';
+  _popover.style.top = top + 'px';
+  _setActiveTrigger(btn);
+  _wirePopoverClose();
+}
+
+// restoreFocus=true (cerrar por Escape, boton ✕ o toggle) devuelve el foco al
+// disparador; en click-afuera se pasa false para no pelear con donde clickeo el usuario.
+function hidePopover(restoreFocus) {
+  if (_popover.style.display === 'none') return;
+  _popover.style.display = 'none';
+  var trigger = _activeBtn;
+  _activeBtn = null;
+  if (trigger) {
+    trigger.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) trigger.focus();
+  }
+}
+
+// Cablea el botón de cerrar del popover con un listener propio + stopPropagation, para que
+// el click/tap en la ✕ cierre de una (y no lo intercepte/ignore el listener de "click afuera").
+// Le da foco para que Tab+Enter/Espacio también cierre (accesible en teclado).
+function _wirePopoverClose() {
+  // Nombre accesible del dialog = su titulo (para que el lector anuncie de que es el popover).
+  var titleEl = _popover.querySelector('.pop-title');
+  _popover.setAttribute('aria-label', titleEl ? titleEl.textContent : 'Detalle del indicador');
+  var b = _popover.querySelector('.pop-close');
+  if (!b) return;
+  b.addEventListener('click', function(ev) { ev.stopPropagation(); hidePopover(true); });
+  b.focus();
+}
+
+// Fallback tap-to-reveal para el heatmap en mobile/touch (el title nativo no dispara
+// sin hover). Muestra P95 + Δ + watch_reason en el mismo popover, al tocar/clickear.
+function showCellDetail(cell) {
+  var txt = cell.getAttribute('data-detail');
+  if (!txt) return;
+  if (_activeBtn === cell && _popover.style.display !== 'none') { hidePopover(true); return; }
+  var run = cell.getAttribute('data-run') || '';
+  _popover.innerHTML = '<div class="pop-title">' + run + '</div>' +
+    '<div class="pop-body">' + txt.split(' · ').join('<br>') + '</div>' +
+    '<button type="button" class="pop-close" aria-label="Cerrar">✕</button>';
+  _popover.style.display = 'block';
+  var r = cell.getBoundingClientRect();
+  var pw = _popover.offsetWidth || 260;
+  var ph = _popover.offsetHeight || 120;
+  var left = r.left + r.width / 2 - pw / 2;
+  if (left < 8) left = 8;
+  if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+  var top = r.bottom + 8;
+  if (top + ph > window.innerHeight - 8) top = r.top - ph - 8;
+  if (top < 8) top = 8;
+  _popover.style.left = left + 'px';
+  _popover.style.top = top + 'px';
+  _setActiveTrigger(cell);
+  _wirePopoverClose();
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.classList.contains('info-btn') && !e.target.closest('.hm-cell')
+      && !_popover.contains(e.target)) {
+    hidePopover(false);
+  }
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') hidePopover(true);
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList
+      && e.target.classList.contains('hm-cell')) {
+    e.preventDefault();
+    showCellDetail(e.target);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Lazy chart init — los charts en tabs ocultos (display:none) tienen canvas
+// con dimensiones cero hasta que el tab se muestra por primera vez.
+// Si Chart.js no cargó (CDN bloqueado/caído), se degrada a barras HTML.
+// ---------------------------------------------------------------------------
+var _chartInits = {};
+var _chartInstances = {};
+
+function initChart(id, config) {
+  _chartInits[id] = config;
+}
+
+function _cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+// Convierte un hex resuelto de un token (#rrggbb) a rgba con alpha, para los rellenos
+// de area de los charts (que necesitan transparencia y no un token solido).
+function _hexToRgba(hex, a) {
+  hex = (hex || '').trim().replace('#', '');
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  var n = parseInt(hex, 16);
+  if (isNaN(n)) return 'rgba(148,163,184,' + a + ')';
+  return 'rgba(' + ((n>>16)&255) + ',' + ((n>>8)&255) + ',' + (n&255) + ',' + a + ')';
+}
+
+// Aplica los colores de texto/grilla del tema activo a los defaults de Chart.js,
+// para que los labels de ejes y la leyenda se lean bien tanto en claro como oscuro.
+function _applyChartTheme() {
+  if (typeof Chart === 'undefined') return;
+  Chart.defaults.color = _cssVar('--chart-tick') || '#718096';
+  Chart.defaults.borderColor = _cssVar('--chart-grid') || 'rgba(148,163,184,0.28)';
+  Chart.defaults.font.family = _cssVar('--font-sans') ||
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+}
+
+// Re-tematiza los charts ya instanciados cuando el usuario cambia de tema.
+function _reThemeCharts() {
+  if (typeof Chart === 'undefined') return;
+  _applyChartTheme();
+  var grid = _cssVar('--chart-grid') || 'rgba(148,163,184,0.28)';
+  Object.keys(_chartInstances).forEach(function(id) {
+    var inst = _chartInstances[id];
+    if (!inst) return;
+    // Re-resolver los colores semanticos de cada dataset segun el tema activo
+    // (los charts categoricos del picker no tienen estos tags -> quedan igual).
+    ((inst.data && inst.data.datasets) || []).forEach(function(ds) {
+      if (ds._cvar) ds.borderColor = _cssVar(ds._cvar);
+      if (ds._cbg) ds.backgroundColor = _hexToRgba(_cssVar(ds._cbg), ds._cbgA || 0.1);
+      if (ds._barVars) ds.backgroundColor = ds._barVars.map(function(v) { return _cssVar(v); });
+    });
+    if (inst.options && inst.options.scales) {
+      Object.keys(inst.options.scales).forEach(function(ax) {
+        var sc = inst.options.scales[ax];
+        if (sc && sc.grid && sc.grid.display !== false) sc.grid.color = grid;
+      });
+    }
+    inst.update('none');
+  });
+}
+
+function renderFallbackBars(canvas, config) {
+  var labels = (config.data && config.data.labels) || [];
+  var datasets = (config.data && config.data.datasets) || [];
+  var ds = datasets[0];
+  if (!ds || !labels.length) return;
+  var vals = ds.data.map(function(v) { return (typeof v === 'number') ? v : null; });
+  var numeric = vals.filter(function(v) { return v !== null; });
+  var max = numeric.length ? Math.max.apply(null, numeric) : 1;
+  if (max <= 0) max = 1;
+  var html = '<div class="chart-fallback">';
+  for (var i = 0; i < labels.length; i++) {
+    var v = vals[i];
+    var pct = v !== null ? (v / max * 100) : 0;
+    html += '<div class="fb-row"><span class="fb-label">' + String(labels[i]) + '</span>' +
+            '<div class="fb-bar-track"><div class="fb-bar" style="width:' + pct.toFixed(1) +
+            '%;background:' + (ds.borderColor || '#4299e1') + ';"></div></div>' +
+            '<span class="fb-val">' + (v !== null ? v : '—') + '</span></div>';
+  }
+  html += '</div><p style="font-size:0.72rem;color:var(--text-faint);margin-top:6px;">' +
+          '⚠️ Chart.js no disponible (posible bloqueo de red al CDN) — mostrando vista simplificada.</p>';
+  canvas.parentElement.innerHTML = html;
+}
+
+function initChartsInTab(paneId) {
+  var pane = document.getElementById(paneId);
+  if (!pane) return;
+  _applyChartTheme();
+  pane.querySelectorAll('canvas').forEach(function(canvas) {
+    var id = canvas.id;
+    if (_chartInits[id] && !_chartInstances[id]) {
+      if (typeof Chart === 'undefined') {
+        renderFallbackBars(canvas, _chartInits[id]);
+      } else {
+        _chartInstances[id] = new Chart(canvas.getContext('2d'), _chartInits[id]);
+      }
+      delete _chartInits[id];
+    }
+  });
+  _syncTimelineHover();
+}
+
+// Tooltip/crosshair sincronizado entre los dos charts del Timeline de la corrida
+// (latencia + throughput comparten eje X). Al pasar el mouse por uno, resalta el
+// mismo índice temporal en el otro. Dataset pequeño (~bins de 30s), update() barato.
+var _timelineHoverWired = false;
+function _syncTimelineHover() {
+  if (_timelineHoverWired || typeof Chart === 'undefined') return;
+  var a = _chartInstances['timelineLatChart'];
+  var b = _chartInstances['timelineTpsChart'];
+  if (!a || !b) return;
+  _timelineHoverWired = true;
+  function link(src, tgt) {
+    src.canvas.addEventListener('mousemove', function(e) {
+      var pts = src.getElementsAtEventForMode(e, 'index', { intersect: false }, true);
+      if (!pts.length) return;
+      var idx = pts[0].index;
+      var act = tgt.data.datasets.map(function(_, di) { return { datasetIndex: di, index: idx }; });
+      tgt.setActiveElements(act);
+      tgt.tooltip.setActiveElements(act, { x: 0, y: 0 });
+      tgt.update();
+    });
+    src.canvas.addEventListener('mouseout', function() {
+      tgt.setActiveElements([]);
+      tgt.tooltip.setActiveElements([], { x: 0, y: 0 });
+      tgt.update();
+    });
+  }
+  link(a, b);
+  link(b, a);
+}
+
+// Al abrir un <details> colapsable, redimensionar (o crear) los charts que contiene:
+// un canvas creado mientras el details estaba cerrado quedó con tamaño 0.
+document.querySelectorAll('details.section').forEach(function(d) {
+  d.addEventListener('toggle', function() {
+    if (!d.open) return;
+    d.querySelectorAll('canvas').forEach(function(c) {
+      if (_chartInstances[c.id]) {
+        _chartInstances[c.id].resize();
+      } else if (_chartInits[c.id]) {
+        if (typeof Chart === 'undefined') {
+          renderFallbackBars(c, _chartInits[c.id]);
+        } else {
+          _chartInstances[c.id] = new Chart(c.getContext('2d'), _chartInits[c.id]);
+        }
+        delete _chartInits[c.id];
+      }
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Tablas ordenables por click en columna (sin librería externa)
+// ---------------------------------------------------------------------------
+function _sortCellValue(td) {
+  var t = td.textContent.trim();
+  if (t === '' || t === '—') return null;  // sin dato -> siempre al final
+  var num = parseFloat(t.replace(/[^0-9.\-]/g, ''));
+  if (!isNaN(num) && /^[+-]?[\d.,]+\s*(ms|%|x|×|\/s|KB\/s|KB)?$/i.test(t)) return num;
+  return t.toLowerCase();
+}
+
+function makeSortable(table) {
+  var thead = table.querySelector('thead');
+  var tbody = table.querySelector('tbody');
+  if (!thead || !tbody) return;
+  var ths = Array.prototype.slice.call(thead.querySelectorAll('th'));
+  function doSort(th, idx) {
+    var allRows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+    var pinned = allRows.filter(function(r) { return r.classList.contains('sort-pin'); });
+    var rows = allRows.filter(function(r) { return !r.classList.contains('sort-pin'); });
+    var dir = th.dataset.dir === 'asc' ? 'desc' : 'asc';
+    ths.forEach(function(o) {
+      o.dataset.dir = ''; o.setAttribute('aria-sort', 'none');
+      o.innerHTML = o.innerHTML.replace(/ ?[▲▼]$/, '');
+    });
+    th.dataset.dir = dir;
+    th.setAttribute('aria-sort', dir === 'asc' ? 'ascending' : 'descending');
+    th.innerHTML += (dir === 'asc' ? ' ▲' : ' ▼');
+    rows.sort(function(a, b) {
+      var av = _sortCellValue(a.children[idx]);
+      var bv = _sortCellValue(b.children[idx]);
+      if (av === null || bv === null) {
+        if (av === null && bv === null) return 0;
+        return av === null ? 1 : -1;  // sin dato al final en ambas direcciones
+      }
+      if (typeof av === 'number' && typeof bv === 'number') {
+        return dir === 'asc' ? av - bv : bv - av;
+      }
+      av = String(av); bv = String(bv);
+      return dir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+    });
+    rows.forEach(function(r) { tbody.appendChild(r); });
+    pinned.forEach(function(r) { tbody.appendChild(r); });
+  }
+  ths.forEach(function(th, idx) {
+    th.setAttribute('tabindex', '0');
+    th.setAttribute('role', 'columnheader');
+    th.setAttribute('aria-sort', 'none');
+    th.addEventListener('click', function() { doSort(th, idx); });
+    th.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doSort(th, idx); }
+    });
+  });
+}
+document.querySelectorAll('table.sortable').forEach(makeSortable);
+
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-pane').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+  document.getElementById('pane-' + tabName).classList.add('active');
+  var activeBtn = document.getElementById('btn-' + tabName);
+  activeBtn.classList.add('active');
+  activeBtn.setAttribute('aria-selected', 'true');
+  initChartsInTab('pane-' + tabName);
+  if (tabName === 'historial') _refreshSamplerTrend();
+  if (tabName === 'tecnico') _refreshTimelineService();
+}
+
+// Registrar chart configs
+initChart('trendChart', {
+  type: 'line',
+  data: {
+    labels: ["2026-07-21"],
+    datasets: [{
+      label: 'avg P95 (ms)',
+      data: [402.6],
+      borderColor: _cssVar('--color-info'),
+      backgroundColor: _hexToRgba(_cssVar('--color-info'), 0.1),
+      _cvar: '--color-info', _cbg: '--color-info', _cbgA: 0.1,
+      fill: true, tension: 0.3, pointRadius: 4,
+    },{
+      label: 'Baseline global (ms)',
+      data: [403],
+      borderColor: _cssVar('--text-faint'), borderDash: [6,3],
+      _cvar: '--text-faint',
+      fill: false, tension: 0.3, pointRadius: 0,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+      tooltip: { mode: 'index', intersect: false }
+    },
+    scales: {
+      y: { beginAtZero: false, ticks: { callback: function(v) { return v + ' ms'; }, font: { size: 11 } }, grid: { color: 'rgba(148,163,184,0.28)' } },
+      x: { ticks: { font: { size: 11 } }, grid: { display: false } }
+    }
+  }
+});
+
+initChart('timelineLatChart', {
+    type: 'line',
+    data: {
+      labels: ["0s", "30s", "60s", "90s"],
+      datasets: [
+        { label: 'P95 (ms)', data: [514.8, 600.1, 541.0, 467.8], borderColor: _cssVar('--color-critical'),
+           backgroundColor: _hexToRgba(_cssVar('--color-critical'), 0.08),
+           _cvar: '--color-critical', _cbg: '--color-critical', _cbgA: 0.08,
+           fill: true, tension: 0.3, pointRadius: 3 },
+        { label: 'P50 (ms)', data: [305.0, 303.0, 303.0, 466.0], borderColor: _cssVar('--color-info'),
+           backgroundColor: 'transparent', _cvar: '--color-info',
+           fill: false, tension: 0.3, pointRadius: 3, borderDash: [4,2] }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+                 tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        y: { ticks: { callback: v => v + ' ms', font: { size: 10 } }, grid: { color: 'rgba(148,163,184,0.28)' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
+  initChart('timelineTpsChart', {
+    type: 'line',
+    data: {
+      labels: ["0s", "30s", "60s", "90s"],
+      datasets: [
+        { label: 'TPS (req/s)', data: [2.87, 2.77, 2.87, 0.1], borderColor: _cssVar('--color-ok'),
+           backgroundColor: _hexToRgba(_cssVar('--color-ok'), 0.08),
+           _cvar: '--color-ok', _cbg: '--color-ok', _cbgA: 0.08,
+           fill: true, tension: 0.3, pointRadius: 3 },
+        { label: 'Error %', data: [0.0, 0.0, 0.0, 0.0], borderColor: _cssVar('--color-warning'),
+           backgroundColor: 'transparent', _cvar: '--color-warning',
+           fill: false, tension: 0.1, pointRadius: 3, borderDash: [2,2] }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+                 tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { font: { size: 10 } }, grid: { color: 'rgba(148,163,184,0.28)' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
+initChart('versionTrendChart', {
+    type: 'bar',
+    data: {
+      labels: ["build-80"],
+      datasets: [{
+        label: 'avg P95 (ms)',
+        data: [402.6],
+        _barVars: ["--color-info-strong"],
+        backgroundColor: ["--color-info-strong"].map(function(v) { return _cssVar(v); }),
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            afterLabel: function(ctx) {
+              var counts = [1];
+              return 'Corridas: ' + counts[ctx.dataIndex];
+            }
+          }
+        }
+      },
+      scales: {
+        y: { beginAtZero: false, ticks: { callback: v => v + ' ms', font: { size: 10 } }, grid: { color: 'rgba(148,163,184,0.28)' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
+
+// ---------------------------------------------------------------------------
+// Explorador de tendencia por sampler (tab Historial) — chart dinámico según
+// la selección del usuario en #samplerTrendSelect.
+// ---------------------------------------------------------------------------
+var _samplerHistory = {};
+// Paleta categórica validada con scripts/validate_palette.js (dataviz skill):
+// chroma floor PASS, CVD separation PASS (deutan peor 8.2). Ver color-formula.md.
+var _samplerColors = ["#3b7dd8", "#e8563f", "#0ea371", "#a25bd6", "#e0982a", "#e0399a", "#66a80f", "#12a3b4"];
+// Color ESTABLE por label (no por posición en la selección): el punto del selector
+// y la línea del chart usan el mismo color para un sampler dado, sin repintarse al
+// cambiar la selección (dataviz: "el color sigue a la entidad, no a su rango").
+var _spColorByLabel = {"GET /": "#3b7dd8", "GET /login": "#e8563f", "GET /reserve.php": "#0ea371", "GET /vacation.html": "#a25bd6"};
+function _colorFor(lbl, i) {
+  return _spColorByLabel[lbl] || _samplerColors[i % _samplerColors.length];
+}
+
+// ---------------------------------------------------------------------------
+// Componente selector de series (buscador + tabs de estado + checklist con punto
+// de color + Todas/Limpiar). Reusable; dispara onChange en cada cambio.
+// ---------------------------------------------------------------------------
+function _pickerSelected(pickerId) {
+  var root = document.getElementById(pickerId);
+  if (!root) return [];
+  return Array.prototype.slice.call(root.querySelectorAll('.sp-row input:checked'))
+    .map(function(i) { return i.value; });
+}
+
+function initSeriesPicker(pickerId, onChange) {
+  var root = document.getElementById(pickerId);
+  if (!root) return;
+  var search = root.querySelector('.sp-search');
+  var listEl = root.querySelector('.sp-list');
+  var emptyEl = root.querySelector('.sp-empty');
+  var rows = Array.prototype.slice.call(root.querySelectorAll('.sp-row'));
+  var tabs = Array.prototype.slice.call(root.querySelectorAll('.sp-tab'));
+  var activeFilter = 'all';
+  function applyFilter() {
+    var q = (search.value || '').toLowerCase();
+    var visible = 0;
+    rows.forEach(function(r) {
+      var lbl = (r.getAttribute('data-label') || '').toLowerCase();
+      var st = r.getAttribute('data-status') || '';
+      var matchText = !q || lbl.indexOf(q) !== -1;
+      var matchTab = activeFilter === 'all' || st.indexOf(activeFilter) !== -1;
+      var show = matchText && matchTab;
+      r.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    if (emptyEl) emptyEl.style.display = visible ? 'none' : '';
+  }
+  search.addEventListener('input', applyFilter);
+  tabs.forEach(function(t) {
+    t.addEventListener('click', function() {
+      tabs.forEach(function(o) { o.classList.remove('active'); o.setAttribute('aria-pressed', 'false'); });
+      t.classList.add('active'); t.setAttribute('aria-pressed', 'true');
+      activeFilter = t.getAttribute('data-f'); applyFilter();
+    });
+  });
+  rows.forEach(function(r) {
+    r.querySelector('input').addEventListener('change', function() { onChange(); });
+  });
+  root.querySelector('.sp-all').addEventListener('click', function() {
+    rows.forEach(function(r) { if (r.style.display !== 'none') r.querySelector('input').checked = true; });
+    onChange();
+  });
+  root.querySelector('.sp-none').addEventListener('click', function() {
+    rows.forEach(function(r) { r.querySelector('input').checked = false; });
+    onChange();
+  });
+  applyFilter();
+}
+
+function _buildSamplerTrendConfig(selectedLabels) {
+  var allDates = [];
+  selectedLabels.forEach(function(lbl) {
+    (_samplerHistory[lbl] || []).forEach(function(p) {
+      if (allDates.indexOf(p.date) === -1) allDates.push(p.date);
+    });
+  });
+  allDates.sort();
+  var datasets = selectedLabels.map(function(lbl, i) {
+    var byDate = {};
+    (_samplerHistory[lbl] || []).forEach(function(p) { byDate[p.date] = p.p95; });
+    return {
+      label: lbl,
+      data: allDates.map(function(d) { return byDate.hasOwnProperty(d) ? byDate[d] : null; }),
+      borderColor: _colorFor(lbl, i),
+      backgroundColor: 'transparent',
+      spanGaps: true, tension: 0.3, pointRadius: 3,
+    };
+  });
+  return {
+    data: { labels: allDates, datasets: datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+                 tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        y: { ticks: { callback: function(v) { return v + ' ms'; }, font: { size: 10 } }, grid: { color: 'rgba(148,163,184,0.28)' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  };
+}
+
+function _refreshSamplerTrend() {
+  var canvas = document.getElementById('samplerTrendChart');
+  if (!canvas) return;
+  var selected = _pickerSelected('sp-sampler-trend');
+  // seleccion vacia -> chart vacio (no dejar las lineas de la seleccion anterior)
+  var config = _buildSamplerTrendConfig(selected);
+  if (typeof Chart === 'undefined') {
+    renderFallbackBars(canvas, config);
+    return;
+  }
+  if (_chartInstances['samplerTrendChart']) {
+    _chartInstances['samplerTrendChart'].data = config.data;
+    _chartInstances['samplerTrendChart'].update();
+  } else {
+    _chartInstances['samplerTrendChart'] = new Chart(canvas.getContext('2d'), Object.assign({type: 'line'}, config));
+  }
+}
+
+initSeriesPicker('sp-sampler-trend', _refreshSamplerTrend);
+
+// ---------------------------------------------------------------------------
+// Timeline por servicio (tab Técnico) — mismo patrón que el explorador de
+// tendencia por sampler, pero con los bins de ESTA corrida (eje X = segundos
+// desde el inicio) en vez del historial entre corridas.
+// ---------------------------------------------------------------------------
+var _timelineByLabel = {"GET /": [{"t_s": 0, "p50": 474.5, "p95": 636.7, "error_pct": 0.0, "count": 22}, {"t_s": 30, "p50": 472.0, "p95": 643.0, "error_pct": 0.0, "count": 21}, {"t_s": 60, "p50": 468.0, "p95": 628.0, "error_pct": 0.0, "count": 21}, {"t_s": 90, "p50": 467.0, "p95": 467.9, "error_pct": 0.0, "count": 2}], "GET /login": [{"t_s": 0, "p50": 304.5, "p95": 328.9, "error_pct": 0.0, "count": 22}, {"t_s": 30, "p50": 303.5, "p95": 325.3, "error_pct": 0.0, "count": 20}, {"t_s": 60, "p50": 302.0, "p95": 316.9, "error_pct": 0.0, "count": 22}], "GET /reserve.php": [{"t_s": 0, "p50": 299.0, "p95": 318.0, "error_pct": 0.0, "count": 21}, {"t_s": 30, "p50": 300.0, "p95": 327.0, "error_pct": 0.0, "count": 21}, {"t_s": 60, "p50": 303.5, "p95": 328.6, "error_pct": 0.0, "count": 22}], "GET /vacation.html": [{"t_s": 0, "p50": 284.0, "p95": 318.0, "error_pct": 0.0, "count": 21}, {"t_s": 30, "p50": 288.0, "p95": 318.0, "error_pct": 0.0, "count": 21}, {"t_s": 60, "p50": 281.0, "p95": 310.0, "error_pct": 0.0, "count": 21}, {"t_s": 90, "p50": 274.0, "p95": 274.0, "error_pct": 0.0, "count": 1}]};
+
+function _buildTimelineServiceConfig(selectedLabels) {
+  var allTs = [];
+  selectedLabels.forEach(function(lbl) {
+    (_timelineByLabel[lbl] || []).forEach(function(b) {
+      if (allTs.indexOf(b.t_s) === -1) allTs.push(b.t_s);
+    });
+  });
+  allTs.sort(function(a, b) { return a - b; });
+  var datasets = selectedLabels.map(function(lbl, i) {
+    var byTs = {};
+    (_timelineByLabel[lbl] || []).forEach(function(b) { byTs[b.t_s] = b.p95; });
+    return {
+      label: lbl,
+      data: allTs.map(function(t) { return byTs.hasOwnProperty(t) ? byTs[t] : null; }),
+      borderColor: _colorFor(lbl, i),
+      backgroundColor: 'transparent',
+      spanGaps: true, tension: 0.3, pointRadius: 3,
+    };
+  });
+  return {
+    data: { labels: allTs.map(function(t) { return t + 's'; }), datasets: datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+                 tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        y: { ticks: { callback: function(v) { return v + ' ms'; }, font: { size: 10 } }, grid: { color: 'rgba(148,163,184,0.28)' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  };
+}
+
+function _refreshTimelineService() {
+  var canvas = document.getElementById('timelineServiceChart');
+  if (!canvas) return;
+  var selected = _pickerSelected('sp-timeline-service');
+  // seleccion vacia -> chart vacio (no dejar las lineas de la seleccion anterior)
+  var config = _buildTimelineServiceConfig(selected);
+  if (typeof Chart === 'undefined') {
+    renderFallbackBars(canvas, config);
+    return;
+  }
+  if (_chartInstances['timelineServiceChart']) {
+    _chartInstances['timelineServiceChart'].data = config.data;
+    _chartInstances['timelineServiceChart'].update();
+  } else {
+    _chartInstances['timelineServiceChart'] = new Chart(canvas.getContext('2d'), Object.assign({type: 'line'}, config));
+  }
+}
+
+initSeriesPicker('sp-timeline-service', _refreshTimelineService);
+</script>
+</body>
+</html>
