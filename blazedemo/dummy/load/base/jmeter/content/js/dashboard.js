@@ -133,7 +133,7 @@ $(document).ready(function() {
         widgets: ['zebra']
     });
 
-    var data = {"OkPercent": 99.60629921259843, "KoPercent": 0.3937007874015748};
+    var data = {"OkPercent": 99.55357142857143, "KoPercent": 0.44642857142857145};
     var dataset = [
         {
             "label" : "FAIL",
@@ -173,7 +173,7 @@ $(document).ready(function() {
     });
 
     // Creates APDEX table
-    createTable($("#apdexTable"), {"supportsControllersDiscrimination": true, "overall": {"data": [0.9645669291338582, 500, 1500, "Total"], "isController": false}, "titles": ["Apdex", "T (Toleration threshold)", "F (Frustration threshold)", "Label"], "items": [{"data": [1.0, 500, 1500, "GET /login"], "isController": false}, {"data": [1.0, 500, 1500, "GET /reserve.php"], "isController": false}, {"data": [0.8615384615384616, 500, 1500, "GET /"], "isController": false}, {"data": [1.0, 500, 1500, "GET /vacation.html"], "isController": false}]}, function(index, item){
+    createTable($("#apdexTable"), {"supportsControllersDiscrimination": true, "overall": {"data": [0.9129464285714286, 500, 1500, "Total"], "isController": false}, "titles": ["Apdex", "T (Toleration threshold)", "F (Frustration threshold)", "Label"], "items": [{"data": [0.9732142857142857, 500, 1500, "GET /login"], "isController": false}, {"data": [1.0, 500, 1500, "GET /reserve.php"], "isController": false}, {"data": [0.6964285714285714, 500, 1500, "GET /"], "isController": false}, {"data": [0.9821428571428571, 500, 1500, "GET /vacation.html"], "isController": false}]}, function(index, item){
         switch(index){
             case 0:
                 item = item.toFixed(3);
@@ -187,7 +187,7 @@ $(document).ready(function() {
     }, [[0, 0]], 3);
 
     // Create statistics table
-    createTable($("#statisticsTable"), {"supportsControllersDiscrimination": true, "overall": {"data": ["Total", 254, 1, 0.3937007874015748, 360.35433070866134, 253, 1225, 313.0, 485.0, 529.0, 930.7499999999943, 2.7606595150368993, 14.194073294015672, 0.3308915184442488], "isController": false}, "titles": ["Label", "#Samples", "FAIL", "Error %", "Average", "Min", "Max", "Median", "90th pct", "95th pct", "99th pct", "Transactions/s", "Received", "Sent"], "items": [{"data": ["GET /login", 63, 0, 0.0, 315.3174603174604, 269, 433, 313.0, 342.2, 357.59999999999997, 433.0, 0.7025996185887784, 3.942625910312601, 0.08302202524340058], "isController": false}, {"data": ["GET /reserve.php", 63, 0, 0.0, 304.49206349206355, 262, 359, 303.0, 327.2, 335.4, 359.0, 0.7027250114332243, 4.972962428612062, 0.0871543715351753], "isController": false}, {"data": ["GET /", 65, 1, 1.5384615384615385, 517.3846153846152, 273, 1225, 481.0, 620.4, 683.6999999999997, 1225.0, 0.70646798613149, 3.2654933014607583, 0.07879835229928157], "isController": false}, {"data": ["GET /vacation.html", 63, 0, 0.0, 299.2380952380952, 253, 418, 296.0, 319.8, 371.79999999999984, 418.0, 0.701887296954032, 2.2967464425176587, 0.08842134893268568], "isController": false}]}, function(index, item){
+    createTable($("#statisticsTable"), {"supportsControllersDiscrimination": true, "overall": {"data": ["Total", 224, 1, 0.44642857142857145, 406.41517857142844, 8, 1316, 355.5, 579.0, 668.25, 1196.25, 2.4493723483357392, 12.611828643714736, 0.2934321932543848], "isController": false}, "titles": ["Label", "#Samples", "FAIL", "Error %", "Average", "Min", "Max", "Median", "90th pct", "95th pct", "99th pct", "Transactions/s", "Received", "Sent"], "items": [{"data": ["GET /login", 56, 0, 0.0, 358.9642857142856, 281, 539, 342.0, 470.70000000000005, 509.04999999999995, 539.0, 0.6202168543930182, 3.478509762877806, 0.07328734314605], "isController": false}, {"data": ["GET /reserve.php", 56, 0, 0.0, 351.0535714285714, 278, 493, 338.5, 429.30000000000007, 474.0, 493.0, 0.6195375594645425, 4.383349236641221, 0.07683717778515323], "isController": false}, {"data": ["GET /", 56, 0, 0.0, 599.7678571428571, 445, 1316, 524.0, 810.9000000000003, 1115.2499999999998, 1316.0, 0.618688821618755, 2.874123754336346, 0.0700858430739996], "isController": false}, {"data": ["GET /vacation.html", 56, 1, 1.7857142857142858, 315.87499999999994, 8, 496, 305.5, 382.0, 439.6499999999999, 496.0, 0.6216420230007549, 2.0307652094156565, 0.07691389078526709], "isController": false}]}, function(index, item){
         switch(index){
             // Errors pct
             case 3:
@@ -217,7 +217,7 @@ $(document).ready(function() {
     }, [[0, 0]], 0, summaryTableHeader);
 
     // Create error table
-    createTable($("#errorsTable"), {"supportsControllersDiscrimination": false, "titles": ["Type of error", "Number of errors", "% in errors", "% in all samples"], "items": [{"data": ["Non HTTP response code: java.net.SocketException/Non HTTP response message: Socket closed", 1, 100.0, 0.3937007874015748], "isController": false}]}, function(index, item){
+    createTable($("#errorsTable"), {"supportsControllersDiscrimination": false, "titles": ["Type of error", "Number of errors", "% in errors", "% in all samples"], "items": [{"data": ["Non HTTP response code: java.net.SocketException/Non HTTP response message: Socket closed", 1, 100.0, 0.44642857142857145], "isController": false}]}, function(index, item){
         switch(index){
             case 2:
             case 3:
@@ -228,7 +228,7 @@ $(document).ready(function() {
     }, [[1, 1]]);
 
         // Create top5 errors by sampler
-    createTable($("#top5ErrorsBySamplerTable"), {"supportsControllersDiscrimination": false, "overall": {"data": ["Total", 254, 1, "Non HTTP response code: java.net.SocketException/Non HTTP response message: Socket closed", 1, "", "", "", "", "", "", "", ""], "isController": false}, "titles": ["Sample", "#Samples", "#Errors", "Error", "#Errors", "Error", "#Errors", "Error", "#Errors", "Error", "#Errors", "Error", "#Errors"], "items": [{"data": [], "isController": false}, {"data": [], "isController": false}, {"data": ["GET /", 65, 1, "Non HTTP response code: java.net.SocketException/Non HTTP response message: Socket closed", 1, "", "", "", "", "", "", "", ""], "isController": false}, {"data": [], "isController": false}]}, function(index, item){
+    createTable($("#top5ErrorsBySamplerTable"), {"supportsControllersDiscrimination": false, "overall": {"data": ["Total", 224, 1, "Non HTTP response code: java.net.SocketException/Non HTTP response message: Socket closed", 1, "", "", "", "", "", "", "", ""], "isController": false}, "titles": ["Sample", "#Samples", "#Errors", "Error", "#Errors", "Error", "#Errors", "Error", "#Errors", "Error", "#Errors", "Error", "#Errors"], "items": [{"data": [], "isController": false}, {"data": [], "isController": false}, {"data": [], "isController": false}, {"data": ["GET /vacation.html", 56, 1, "Non HTTP response code: java.net.SocketException/Non HTTP response message: Socket closed", 1, "", "", "", "", "", "", "", ""], "isController": false}]}, function(index, item){
         return item;
     }, [[0, 0]], 0);
 
